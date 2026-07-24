@@ -35,6 +35,11 @@ Three standing improvement directions (the lens for every item below):
 - [ ] **`branch-and-pr` skill** — branch naming, when to open the PR, PR description format, merge
   rules, agent-as-author / human-as-reviewer. *Trigger: the new project adopts feature branches +
   PRs (decided 2026-07-24 to adopt branches early).*
+- [ ] **Generalize the UMHS CRM/API inspection toolkit** — the `.notes/API/` scripts (find-property
+  by label · read-only record/association inspectors · the orphan-audit dry-run/archive pattern ·
+  the token seam · the one-question probe template). The full inventory with porting notes lives in
+  UMHS at `.ai/GENERALIZATION-CANDIDATES.md`. *Trigger: the first project that talks to HubSpot (or
+  any external API) needs grounding tools — port then, parametrized, dry-run-by-default.*
 - [ ] **`adopt-kit` skill** — automate the onboarding interview (copy folders, create data files,
   interview for config blocks). *Trigger: the SECOND adoption — do it manually once first, then
   automate what proved repetitive.*
