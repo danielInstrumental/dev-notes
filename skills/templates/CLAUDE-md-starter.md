@@ -27,6 +27,7 @@ doesn't exist — Claude Code loads it automatically every session). Fill the `<
 
 - Handoffs: `.ai/HANDOFF_LOG.md` (newest on top) · As-built log: `.ai/IMPLEMENTATION_LOG.md`
   (newest at EOF) · Plans: `.ai/PLAN_LOG.md` + `.ai/PLANS/` · Bugs: `<bug log path>` ·
-  Todos: `.ai/TODO.md` (Now / Next / Later — triage new items on entry)
+  Todos: `.ai/TODO.md` (Now / Next / Later — triage new items on entry) ·
+  Architecture: `.ai/ARCHITECTURE.md` (current-state map — reconcile via the handoff sweep)
 - Source code: `<path>` · Tests: `<run command>` → expect `<current expected result>`
 ```

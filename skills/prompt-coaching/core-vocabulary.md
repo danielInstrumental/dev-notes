@@ -97,6 +97,15 @@ given in parentheses).
 - **separation of concerns** — each part addresses one concern; don't tangle them
 - **ubiquitous language** — one precise shared vocabulary used identically in talk, docs, and code
 - **conceptual model / domain model** — the named concepts + relationships you think with
+- **architecture overview** — the one-page current-state map of a system's context, layers, and
+  load-bearing patterns; structured by the **C4 model**'s zoom levels (context → containers →
+  components → code; maintain only the top two)
+- **ADR (architecture decision record)** — one short record per significant decision: context,
+  decision, consequences (a plan log's decisions table is ADRs by another name)
+- **diagrams-as-code** — diagrams written as text (e.g. **Mermaid**) inside markdown: versioned,
+  diffable, rendered by GitHub and artifact viewers
+- **living documentation** — docs with an explicit update TRIGGER and a "last reconciled" date;
+  a current-state doc without a trigger is a rot certainty
 - **unknown unknowns** — the gaps you can't see; the coaching's job is naming them
 - **backlog** — the queue of known-but-not-current work (the far end is the **icebox**: someday/maybe)
 - **triage** — sorting incoming items by urgency BEFORE working on any (Now/Next/Later, P0–P3,

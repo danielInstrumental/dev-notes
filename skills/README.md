@@ -52,7 +52,7 @@ Not skills, but part of the kit:
 | File / folder | What it is |
 |---|---|
 | [`AUTHORING.md`](AUTHORING.md) | The style guide for writing/editing skills in this kit — read before adding skill #6 |
-| [`templates/`](templates/) | Starter data files (handoff/implementation/plan/bug logs + TODO with Now/Next/Later triage) + the `CLAUDE.md` starter block |
+| [`templates/`](templates/) | Starter data files (handoff/implementation/plan/bug logs · TODO with Now/Next/Later triage · ARCHITECTURE overview with rot-guards) + the `CLAUDE.md` starter block |
 
 ## Shared file conventions
 
@@ -75,7 +75,8 @@ first); the implementation log is an append-only audit trail (history never reor
 1. Copy the skill folders to `<project>/.claude/skills/` (not `AUTHORING.md` or `templates/` —
    those stay in this repo).
 2. Copy the data-file skeletons from [`templates/`](templates/) into the project
-   (`.ai/HANDOFF_LOG.md`, `.ai/IMPLEMENTATION_LOG.md`, `.ai/PLAN_LOG.md`, `.ai/TODO.md`, the bug log).
+   (`.ai/HANDOFF_LOG.md`, `.ai/IMPLEMENTATION_LOG.md`, `.ai/PLAN_LOG.md`, `.ai/TODO.md`,
+   `.ai/ARCHITECTURE.md`, the bug log).
 3. Fill in the **Project Configuration** block at the top of each `SKILL.md` — deploy command and
    owner, verification method, tech stack, paths.
 4. Paste the block from [`templates/CLAUDE-md-starter.md`](templates/CLAUDE-md-starter.md) into the
