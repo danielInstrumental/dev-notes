@@ -108,6 +108,10 @@ given in parentheses).
   a current-state doc without a trigger is a rot certainty
 - **unknown unknowns** — the gaps you can't see; the coaching's job is naming them
 - **backlog** — the queue of known-but-not-current work (the far end is the **icebox**: someday/maybe)
+- **roadmap** — a project's forward plan at the direction level (vs a TODO's task level); a
+  **CHANGELOG** is its backward mirror — what shipped, per version
+- **dogfooding** — using your own product/conventions on themselves (the kit's roadmap runs on the
+  kit's own TODO format)
 - **triage** — sorting incoming items by urgency BEFORE working on any (Now/Next/Later, P0–P3,
   MoSCoW are the common schemes)
 - 🏠 **standing instruction** (≈ a directive applying to every future turn)

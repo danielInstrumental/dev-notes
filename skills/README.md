@@ -52,6 +52,7 @@ Not skills, but part of the kit:
 | File / folder | What it is |
 |---|---|
 | [`AUTHORING.md`](AUTHORING.md) | The style guide for writing/editing skills in this kit — read before adding skill #6 |
+| [`ROADMAP.md`](ROADMAP.md) | The kit's own forward plan (Now/Next/Later with triggers) — simplify · generalize · formalize |
 | [`templates/`](templates/) | Starter data files (handoff/implementation/plan/bug logs · TODO with Now/Next/Later triage · ARCHITECTURE overview with rot-guards) + the `CLAUDE.md` starter block |
 
 ## Shared file conventions
