@@ -75,6 +75,20 @@ given in parentheses).
 - **incremental development** — extending a proven path piece by piece, vs **big-bang** (build
   everything, connect at the end, meet all the wiring bugs at once)
 
+## Version-control workflow — how changes reach main
+
+- **feature branch** — an isolated line of history per task; `main` stays always-releasable
+- **pull request (PR)** — a proposal to merge a branch, showing the full diff; where review and CI
+  attach
+- **code review** — a second reader approves the diff before merge (with agents: the agent authors,
+  the human reviews)
+- **trunk-based development** — small short-lived branches merged to main frequently (the modern
+  default), vs long-lived branch schemes (GitFlow)
+- **CI gate on the PR** — tests/lint run automatically; red blocks the merge button
+- **worktree / private clone** — an isolated copy where an agent works without touching the main
+  checkout
+- **remote** — the shared copy (e.g. GitHub); push publishes local commits to it
+
 ## Process & knowledge — how teams work
 
 - **convention** — an agreed rule/style (enforced by discipline, not by the machine)
