@@ -84,6 +84,9 @@ given in parentheses).
 - **ubiquitous language** — one precise shared vocabulary used identically in talk, docs, and code
 - **conceptual model / domain model** — the named concepts + relationships you think with
 - **unknown unknowns** — the gaps you can't see; the coaching's job is naming them
+- **backlog** — the queue of known-but-not-current work (the far end is the **icebox**: someday/maybe)
+- **triage** — sorting incoming items by urgency BEFORE working on any (Now/Next/Later, P0–P3,
+  MoSCoW are the common schemes)
 - 🏠 **standing instruction** (≈ a directive applying to every future turn)
 - 🏠 **stranger test** (≈ could a competent stranger continue from the artifacts alone?)
 
