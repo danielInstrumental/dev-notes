@@ -61,6 +61,20 @@ given in parentheses).
   redden on a planned event) · 🏠 **drift guard / parity test** (≈ consistency check between
   deliberate copies)
 
+## Build strategies — how to sequence construction
+
+- **vertical slice** — one thin feature path through EVERY layer (two fields: schema → save →
+  read → display), vs a **horizontal slice** (one whole layer at a time — whose weakness is that
+  end-to-end flow is invisible until the very end)
+- **walking skeleton** — the smallest end-to-end implementation that actually runs through all
+  layers; build it first, then add flesh incrementally
+- **tracer bullet** — a walking skeleton built specifically to SEE the trajectory (logs at each
+  hop); tracer code is KEPT and extended
+- **spike / prototype** — throwaway code written only to answer a question, then deleted (the
+  opposite of a tracer bullet — never let a spike quietly become production)
+- **incremental development** — extending a proven path piece by piece, vs **big-bang** (build
+  everything, connect at the end, meet all the wiring bugs at once)
+
 ## Process & knowledge — how teams work
 
 - **convention** — an agreed rule/style (enforced by discipline, not by the machine)
