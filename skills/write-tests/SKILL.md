@@ -31,6 +31,11 @@ predicted-test-impact section feeds this), fixing a bug, or setting up a new pro
    app driven like a user, e.g. Playwright). The ratio is economics, not ideology: unit tests are
    cheap and pinpoint the broken line; E2E tests are slow, flaky, and only say "something broke
    somewhere." Buy confidence at the cheapest tier that can prove the thing.
+   **The pyramid is a default shape, not a quota** — put each test at the tier where the risk
+   actually lives. A unit test cannot prove wiring (a real schema, auth scopes, two systems
+   agreeing); when a project is mostly glue around external systems, its middle tier legitimately
+   grows. What stays true at every tier: hermetic-by-default below, real-things-in-play above, and
+   never test at a higher tier what a lower tier can prove.
 2. **Tests ship WITH the change — same unit, same commit.** "Tests later" never comes. The strict
    version is **TDD**: write the failing test first (red) → minimum code to pass (green) →
    refactor. The minimum bar is test-with-the-change.
@@ -108,4 +113,5 @@ modes that matter most when agents edit code across many sessions:
 - `write-handoff` — new pins/tripwires and their flip conditions go in the handoff's DO-NOT list;
   the tests README is a row in the pre-handoff sweep.
 - `test-taxonomy.md` (this folder) — the full reference: all test kinds, when to reach for each,
-  and the growth ladder (coverage → property-based → mutation → E2E → CI).
+  and the growth ladder (coverage → property-based → mutation → integration → E2E → CI; the
+  integration rung can come early for boundary-heavy projects).

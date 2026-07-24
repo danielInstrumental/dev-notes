@@ -46,8 +46,12 @@ before — premature tooling is maintenance debt.
    merge logic) and hand-picked cases keep missing edges.*
 4. **Mutation testing** — *trigger: the suite is large and you want to know if it would actually
    catch a bug (especially when agents wrote many of the tests).* Run occasionally, not per-commit.
-5. **E2E smoke suite** (Playwright) — *trigger: manual browser-verify of the same core flows is
+5. **Integration tests** — *trigger: bugs keep appearing at boundaries the unit suite can't see
+   (wiring, schemas, permissions, two systems disagreeing), or the project is mostly glue code
+   around external systems.* This rung can come EARLY — for integration-heavy projects it matters
+   more than rungs 2–4; the pyramid is a default, not a quota.
+6. **E2E smoke suite** (Playwright) — *trigger: manual browser-verify of the same core flows is
    eating real time every session.* Keep it small (5–10 flows); flakiness grows with size.
-6. **CI gate** — *trigger: more than one person/agent merges code, or you've merged something with
+7. **CI gate** — *trigger: more than one person/agent merges code, or you've merged something with
    a red suite once.* The suite + lint on every push; red blocks merge. This is the rung that turns
    tests into a gauntlet — everything below it is optional until the machine enforces it.

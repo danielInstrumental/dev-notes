@@ -40,7 +40,7 @@ SESSION END ───▶ current-state sweep + write the handoff               (
 | ↳ [`change-impact-checklist.md`](plan-first/change-impact-checklist.md) | The dependency-impact checklist (§§1–8) the plan phases walk | Inside plan Phases 2 and 7 |
 | [`log-implementation/`](log-implementation/SKILL.md) | One as-built entry per verified unit of change | After each user-verified change |
 | [`write-tests/`](write-tests/SKILL.md) | Conventional testing practice (pyramid, AAA, test-with-the-change) + agentic pins/guards/tripwires | Writing any test; choosing what kind a change needs |
-| ↳ [`test-taxonomy.md`](write-tests/test-taxonomy.md) | All test kinds + the growth ladder (coverage → property-based → mutation → E2E → CI) | Reference, on demand |
+| ↳ [`test-taxonomy.md`](write-tests/test-taxonomy.md) | All test kinds + the growth ladder (coverage → property-based → mutation → integration → E2E → CI) | Reference, on demand |
 | [`write-commits/`](write-commits/SKILL.md) | Commit message conventions — Conventional Commits types + the seven timeless rules | Every commit / commit recommendation |
 | [`write-handoff/`](write-handoff/SKILL.md) | The 13-section session handoff + the pre-handoff staleness sweep | Once, at session end |
 | [`prompt-coaching/`](prompt-coaching/SKILL.md) | Standing instruction: coach the user's prompts every turn | Every turn, every session (standing rule) |
