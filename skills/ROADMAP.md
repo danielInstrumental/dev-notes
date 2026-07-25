@@ -35,11 +35,23 @@ Three standing improvement directions (the lens for every item below):
 - [ ] **`branch-and-pr` skill** — branch naming, when to open the PR, PR description format, merge
   rules, agent-as-author / human-as-reviewer. *Trigger: the new project adopts feature branches +
   PRs (decided 2026-07-24 to adopt branches early).*
-- [ ] **Generalize the UMHS CRM/API inspection toolkit** — the `.notes/API/` scripts (find-property
-  by label · read-only record/association inspectors · the orphan-audit dry-run/archive pattern ·
-  the token seam · the one-question probe template). The full inventory with porting notes lives in
-  UMHS at `.ai/GENERALIZATION-CANDIDATES.md`. *Trigger: the first project that talks to HubSpot (or
-  any external API) needs grounding tools — port then, parametrized, dry-run-by-default.*
+- [x] ~~Generalize the UMHS CRM/API inspection toolkit~~ — **READ-ONLY half SHIPPED 2026-07-25**
+  (`snippets/hubspot-readonly/`: find-property · get-record · search-records · list-associations ·
+  find-form · orphan-audit [listing-only] + the token seam). The write half continues below.
+- [ ] **HubSpot WRITE + deeper-inspection helpers** (the deliberate remainder of the toolkit) —
+  each on its own trigger, never before:
+  · **archive-orphans** (the write half of orphan-audit, `--archive` behind an explicit flag) —
+  *trigger: the first real cleanup need in a new project* ·
+  · **reorder-property-options** (sentinel-preserving sort; writes) — *trigger: the first
+  option-ordering ask* ·
+  · **who-wrote-this** (propertiesWithHistory attribution — which integration/user wrote a
+  property value) — *trigger: the first surprise write to attribute* ·
+  · **schema-inspector** (read-only: an object's requiredProperties + primaryDisplayProperty +
+  associations — the "required ≠ existing" pre-build check) — *trigger: the first custom-object
+  build* ·
+  · **export-records** (read-only CSV dump) — *trigger: the first reporting/audit ask* ·
+  · **the one-question probe TEMPLATE** (a documented skeleton for probing any external API) —
+  *trigger: the first non-HubSpot integration.*
 - [ ] **`adopt-kit` skill** — automate the onboarding interview (copy folders, create data files,
   interview for config blocks). *Trigger: the SECOND adoption — do it manually once first, then
   automate what proved repetitive.*
