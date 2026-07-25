@@ -48,6 +48,23 @@ given in parentheses).
 - **defense in depth** — the same protection at multiple layers; the client copy is UX,
   the server copy is the real line
 
+## Security — who may do what, and what can be trusted
+
+- **trust boundary** — the line between code you control and input anyone can forge; everything
+  crossing it is untrusted until validated/authorized ("never trust the client")
+- **authentication (authn)** — proving WHO is calling; derive it server-side from the session,
+  never from a client-sent param
+- **authorization (authz)** — whether that caller MAY do this (logged-in ≠ entitled)
+- **object-level authorization / ownership check** — authz per RECORD: does this id belong to
+  this caller? Its absence is **IDOR/BOLA** — the change-the-id-in-the-URL bug class
+- **least privilege** — every credential carries only the scopes its job needs
+- **attack surface** — everything an attacker can reach or try (endpoints, params, uploads)
+- **validation vs sanitization** — reject bad input vs transform it to be safe (prefer reject +
+  allowlists)
+- **OWASP Top 10 / STRIDE / CWE** — the canonical catalogs and taxonomy of vulnerability classes;
+  the professional shared vocabulary for this family (see the Security family in
+  `problem-classes.md`)
+
 ## Change over time — how code evolves
 
 - **pattern** — a named reusable solution shape
@@ -114,6 +131,13 @@ given in parentheses).
   kit's own TODO format)
 - **triage** — sorting incoming items by urgency BEFORE working on any (Now/Next/Later, P0–P3,
   MoSCoW are the common schemes)
+- **YAGNI** — "You Aren't Gonna Need It": build/adopt when a need actually appears, not because
+  it might be useful someday
+- **right-sizing / proportionality** — matching process and tooling to the project's actual size
+  and risk (see the kit README's "Right-size the adoption")
+- **ceremony** — the formal steps of a process; "high-ceremony" = heavyweight. Ceremony that
+  doesn't earn its cost is what right-sizing trims — but the test is the project's NEED, never
+  the executor's convenience
 - 🏠 **standing instruction** (≈ a directive applying to every future turn)
 - 🏠 **stranger test** (≈ could a competent stranger continue from the artifacts alone?)
 

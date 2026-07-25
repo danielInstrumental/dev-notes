@@ -89,6 +89,69 @@ Entry format — built for RECOGNITION from symptoms:
   *Mitigations:* normalize-on-read gateways, migrations, backward-compatible readers, compatibility
   checks in every schema-touching plan.
 
+## Security — trust boundaries & access
+
+The organizing principle: **never trust the client.** Everything arriving from a browser/caller
+crosses a **trust boundary** and can be forged — the server must validate and authorize it;
+client-side checks are UX only. These classes are canonical, not house style: the maintained
+catalogs are the **OWASP Top 10** + **OWASP API Security Top 10**, the **STRIDE** threat
+taxonomy, and the **CWE** registry (numbers cited per entry). This family is a validated starter
+subset — STRIDE's tampering/repudiation/DoS and OWASP's misconfiguration/SSRF etc. join it when
+a project meets them (grow-rules).
+
+- **Trusting client-supplied identity (spoofing — STRIDE's S)** — the server believes a
+  caller-sent ID/param about WHO is calling.
+  *You might have it when…* identity comes from a query param or request body instead of the
+  authenticated session.
+  *Mitigations:* derive identity server-side from the session/auth context; IGNORE any
+  client-supplied identity params (identity is authentication's job, never an input).
+- **IDOR / missing object-level authorization (BOLA — OWASP API #1)** — an authenticated caller
+  can access ANOTHER user's record by changing the id in the request.
+  *You might have it when…* endpoints take a record id and act on it after only checking the
+  caller is logged in.
+  *Mitigations:* an ownership check on EVERY id-taking endpoint (does this record belong to this
+  caller?), fail-closed (no identity → 401, non-owner → 403). Logged-in ≠ entitled — that's the
+  authn/authz distinction.
+- **Injection (OWASP A03)** — untrusted input woven into a query, command, or URL gets
+  interpreted as code/structure, not data.
+  *You might have it when…* strings are concatenated or interpolated into SQL, shell commands,
+  or request URLs.
+  *Mitigations:* parameterized queries; shape-validate inputs BEFORE interpolation; allowlists
+  over sanitizing.
+- **XSS (cross-site scripting — injection into the browser)** — untrusted content rendered as
+  live HTML/JS in someone else's browser.
+  *You might have it when…* user-provided text reaches raw-HTML APIs (`innerHTML`,
+  `dangerouslySetInnerHTML`).
+  *Mitigations:* framework auto-escaping (never bypass casually); sanitize where raw HTML is
+  truly needed; CSP as backstop.
+- **CSRF (cross-site request forgery — CWE-352)** — another site triggers a state-changing
+  request riding the victim's logged-in session.
+  *You might have it when…* state-changing endpoints rely on cookies alone with no origin/token
+  check.
+  *Mitigations:* CSRF tokens, SameSite cookies, platform-provided protections.
+- **Secrets exposure (CWE-798)** — API keys/tokens reach the repo, the client bundle, or the
+  browser.
+  *You might have it when…* a key sits in a client file "temporarily", or lives in git history.
+  *Mitigations:* secrets server-side only (secret manager / env); gitignored token files or env
+  vars for dev tooling; design the not-configured path; rotate on any suspected leak.
+- **PII leakage into logs/errors (CWE-532)** — personal data flows into logs, error messages, or
+  third-party telemetry.
+  *You might have it when…* debug logging prints whole records ("just log the payload").
+  *Mitigations:* log IDs, never values; redact/pseudonymize fixtures; name exactly what data
+  crosses to any third party and on what basis (a go-live gate, not an afterthought).
+- **Excessive privilege** (violates **least privilege**, Saltzer & Schroeder) — a credential
+  carries scopes far beyond its need, so one leak = full compromise; and a scope GAP on one of
+  two credentials is invisible when you test with the other.
+  *You might have it when…* everything uses one broad token, or "the same call" works in one
+  path and 403s in another.
+  *Mitigations:* least privilege per credential; name WHICH identity each code path uses; probe
+  with the credential that will actually run in production.
+- **Enumeration (CWE-204)** — responses reveal what exists ("no such user" vs "wrong password";
+  sequential ids that can be walked).
+  *You might have it when…* error messages or 404-vs-403 differences leak existence.
+  *Mitigations:* uniform errors/latency on auth paths; non-guessable ids where existence is
+  sensitive.
+
 ## Boundaries & values
 
 - **Off-by-one** — a loop or range is wrong by exactly one (`<` vs `<=`, 0- vs 1-indexed,

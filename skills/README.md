@@ -84,6 +84,38 @@ first); the implementation log is an append-only audit trail (history never reor
    project's `CLAUDE.md` and fill its slots — it wires the loop (run `/session-startup` first,
    plan-first before code, the deploy boundary).
 
+## Right-size the adoption — a menu, not a mandate (and not an excuse)
+
+Projects differ in size and risk; the kit must scale its own adoption, in BOTH directions:
+
+**Don't adopt by default (YAGNI).** The minimal, non-skippable core for ANY project is the loop
+itself: `session-startup` + `plan-first` + `write-handoff`, their data files, and the standing
+rules (stop-on-surprise, one-unit-per-verify, no code without a "go"). Everything else adopts on
+its trigger:
+
+| Piece | Adopt when |
+|---|---|
+| `write-tests` | the project has (or is about to have) a test suite |
+| `log-implementation` | changes are frequent enough to need per-unit as-built records |
+| `write-commits` | the git history matters (shared repo, releases, reviews) |
+| `.ai/ARCHITECTURE.md` | there are layers/flows worth mapping (multi-layer systems, not scripts) |
+| `prompt-coaching` | the user wants the teaching loop (for this user: always) |
+
+**Don't skip by convenience.** Agents default to avoiding work — right-sizing is NOT that:
+
+- The test for skipping is **the project's need and risk, never the executor's effort**. When in
+  doubt, do the work (the full-walk-on-trivial-units rule keeps finding real issues on units
+  that "looked skippable").
+- **N/A must be earned**: a skipped piece is marked with its REASON, visibly — never silently
+  omitted.
+- **Skips are recorded decisions with a re-add trigger** ("skipped write-tests — no suite yet;
+  adopt when the first testable logic ships"), so the decision resurfaces when conditions change.
+- The non-skippable core above is exempt from right-sizing entirely — no project is too small
+  to plan before coding.
+
+(Within a skill, depth scales the same way — see `plan-first`'s "Scaling: light vs heavy plans"
+and the test-taxonomy growth ladder: every phase runs, only the depth varies.)
+
 ## How the kit evolves (upstream first)
 
 This repo is the **upstream**; each project's `.claude/skills/` copy is downstream. When a project
@@ -102,3 +134,6 @@ carries the distilled rule; the lesson file carries the narrative.
   trigger — that's what the pre-handoff sweep is for.
 - **Write for the weakest future reader.** A handoff must survive being read by a less capable
   model (or a tired human) with zero inference required.
+- **Right-size everything — in both directions.** Adopt on trigger, not by default (YAGNI); skip
+  only on the project's need, never the executor's convenience — and every skip is a recorded
+  decision with a re-add trigger.
