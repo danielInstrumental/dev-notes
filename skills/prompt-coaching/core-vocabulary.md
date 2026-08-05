@@ -45,6 +45,14 @@ given in parentheses).
 - **validation** — checking inputs against rules
 - **guard** — an enforced check that gates an action (the server-side one is authoritative)
 - **fail-open / fail-closed** — on error, allow or block? (both valid; unexamined is not)
+- **fail-fast (fail-loud)** — on an unexpected condition, name it and STOP rather than paper over
+  it with a fallback and continue
+- 🏠 **classify-don't-swallow** (≈ fail-fast on unexpected stored state: refuse the write instead
+  of substituting a default)
+- **fail-safe** — when in doubt, protect the stored data at the cost of availability
+- **availability vs durability** — the write-path trade: "operations always succeed" vs "data
+  survives when service degrades"; error handling chooses who pays for a failure — the data
+  (silently, later) or the current request (visibly, now)
 - **defense in depth** — the same protection at multiple layers; the client copy is UX,
   the server copy is the real line
 
@@ -69,6 +77,18 @@ given in parentheses).
 
 - **pattern** — a named reusable solution shape
 - **refactoring** — restructuring without changing behavior
+- **additive change** — new capability with existing paths untouched (vs a **behavioral fix**,
+  which changes what some path does — its risk scales with who can reach that path)
+- 🏠 **fail-path-only change** (≈ a fix confined to an error branch — healthy traffic never
+  executes it, so working flows can't regress; the cheapest correctness class)
+- **hardening** — guards/validation added to make existing behavior safer, no new features
+- **cross-cutting change** — touches many sites or a shared convention; risk lives in COVERAGE
+  (vs a **surgical/localized** fix: one site, one rule)
+- **blast radius** — how much can break if a change is wrong
+- **regression surface** — which existing behaviors need re-verification after a change; near a
+  deadline you ration THIS, not lines of code
+- **reachability** — the estimator for both of the above: who/what can execute the changed code?
+  A 10-line refactor of a shared helper can outweigh a 100-line additive feature
 - **regression** — something that used to work breaking again
 - **technical debt** — shortcuts that must be repaid later (acceptable when chosen consciously)
 - **drift** — duplicated things (rules, copies, docs) falling out of sync silently

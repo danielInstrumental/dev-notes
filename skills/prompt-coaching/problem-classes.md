@@ -57,6 +57,18 @@ Entry format — built for RECOGNITION from symptoms:
   silently never got created.
   *Mitigations:* log every swallowed error with context; observability as a review dimension
   ("when it fails, will anyone KNOW?"); alerts on rates.
+- **Destructive fallback (swallow-then-overwrite)** — the swallowed failure's worse sibling: the
+  recovery value substituted after a caught error (`{}`, empty list, defaults) flows onward into a
+  WRITE, so the fallback overwrites good-but-unreadable data. The failure was recoverable; the
+  "recovery" is what destroys it.
+  *You might have it when…* data vanishes wholesale moments after an error that "was handled" — a
+  corrupt-but-repairable record becomes a valid-but-empty one, with no error anywhere.
+  *Mitigations:* fail-loud on write paths (refuse to write when stored state can't be
+  parsed/trusted — classify-don't-swallow); reserve fallbacks for READ paths, where they can't
+  persist; choose availability-vs-durability consciously per path (for writes over long-lived
+  user data, durability wins). The strongest tell that it's a bug, not a decision: every sibling
+  reader refuses to touch the unparseable state while one writer replaces it (invariant
+  inconsistency).
 - **Unexamined fail-open / fail-closed** — a guard has SOME behavior on error, but nobody chose it:
   fail-open silently lets things through; fail-closed blocks legitimate users on infrastructure
   hiccups.
