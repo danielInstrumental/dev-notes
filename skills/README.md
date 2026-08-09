@@ -43,6 +43,7 @@ SESSION END ───▶ current-state sweep + write the handoff               (
 | ↳ [`test-taxonomy.md`](write-tests/test-taxonomy.md) | All test kinds + the growth ladder (coverage → property-based → mutation → integration → E2E → CI) | Reference, on demand |
 | [`write-commits/`](write-commits/SKILL.md) | Commit message conventions — Conventional Commits types + the seven timeless rules | Every commit / commit recommendation |
 | [`write-handoff/`](write-handoff/SKILL.md) | The 13-section session handoff + the pre-handoff staleness sweep | Once, at session end |
+| [`comment-protocol/`](comment-protocol/SKILL.md) | The agent-legible annotation system: decision fingerprints, KIND/flip-condition headers, KEEP-IN-SYNC markers, dated claims, negative documentation, the stranger test | Day one of a new project; auditing an existing one |
 | [`prompt-coaching/`](prompt-coaching/SKILL.md) | Standing instruction: coach the user's prompts every turn | Every turn, every session (standing rule) |
 | ↳ [`core-vocabulary.md`](prompt-coaching/core-vocabulary.md) | Living map of engineering concept families (conventional vs house-style) — grows with every project | Reference the coaching draws from |
 | ↳ [`problem-classes.md`](prompt-coaching/problem-classes.md) | Living map of bug classes — symptom → class name → standard mitigations | Named aloud whenever a session hits a bug |
