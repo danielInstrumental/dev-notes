@@ -69,6 +69,21 @@ Entry format — built for RECOGNITION from symptoms:
   user data, durability wins). The strongest tell that it's a bug, not a decision: every sibling
   reader refuses to touch the unparseable state while one writer replaces it (invariant
   inconsistency).
+- **Compensating defects (the mutual-protection trap)** — two defects cancel each other out so the
+  feature works; fixing either one ALONE breaks it.
+  *You might have it when…* something "obviously wrong" (a hidden button, a dead style rule, an
+  inverted flag) turns out to be load-bearing — the feature works through an accident that a second
+  defect enables.
+  *Mitigations:* before fixing anything "obviously broken", verify how the feature currently works
+  AT RUNTIME (not from source alone); fix interacting defects as ONE unit, never separately; record
+  the pair loudly wherever either half is listed, so nobody later fixes one half as cleanup.
+- **Correlated reporting failure (shared-fate observability)** — the mechanism that would report a
+  failure fails WITH it, from the same cause — so the failure is silent exactly when it happens.
+  *You might have it when…* a marker/alert/log that "always" gets written is missing precisely for
+  the incident that mattered — the outage took the reporter down with it.
+  *Mitigations:* keep reporting on a separate dependency/path from the thing it reports on; write
+  failure markers from the surviving side of the boundary; test the fail path with the dependency
+  ACTUALLY down (fault injection), not just mocked.
 - **Unexamined fail-open / fail-closed** — a guard has SOME behavior on error, but nobody chose it:
   fail-open silently lets things through; fail-closed blocks legitimate users on infrastructure
   hiccups.
@@ -100,6 +115,19 @@ Entry format — built for RECOGNITION from symptoms:
   *You might have it when…* only OLD records break, or a field is mysteriously empty after a rename.
   *Mitigations:* normalize-on-read gateways, migrations, backward-compatible readers, compatibility
   checks in every schema-touching plan.
+
+## Automation & feedback loops
+
+- **Ambiguous trigger (echo re-fire)** — an automation fires on a state change that BOTH genuine
+  intent and the system's own downstream writes (form echoes, sync-backs, derived updates) produce
+  — so processing an old item re-triggers the flow as if it were a new request.
+  *You might have it when…* an automated message/action duplicates whenever two items overlap or
+  arrive out of order, but a single clean run is silent — N or N−1 duplicates for N overlapping
+  requests is the classic signature.
+  *Mitigations:* trigger on an intent-specific signal (a property written ONLY on genuine intent,
+  e.g. a requested-at timestamp) instead of "field changed"; make echoes no-ops (write only when the
+  value actually differs); keep echoed/derived fields out of trigger predicates; audit every
+  re-enrollment branch for who ELSE writes its trigger field.
 
 ## Security — trust boundaries & access
 
@@ -176,6 +204,13 @@ a project meets them (grow-rules).
   auto-completed because `undefined` was treated as `false`.
   *Mitigations:* name each state's meaning explicitly; test the trichotomy; avoid truthiness checks
   where the distinction matters.
+- **Presence-vs-value check (the empty-skeleton bypass)** — a validity check counts KEYS PRESENT
+  instead of keys holding meaningful VALUES, so a full-but-empty skeleton passes as real data.
+  *You might have it when…* junk input sails through a "does this look like an X" gate — especially
+  when the producer emits its complete schema for ANY input, with values empty or hallucinated.
+  *Mitigations:* count non-empty values, not keys; require a minimum of meaningful fields; push
+  classification upstream to the producer where possible ("is this actually an X?" before "extract
+  the X"); treat an all-empty payload as its own, rejectable case.
 - **Timezone / date bugs** — dates shift by a day (or a year at year-end) crossing timezones or
   formats (US month-first vs ISO).
   *You might have it when…* a date entered as the 1st displays as the 31st, or boundaries fail for
