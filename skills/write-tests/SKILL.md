@@ -91,6 +91,34 @@ modes that matter most when agents edit code across many sessions:
 
 ---
 
+## The static gate — running the linter as a test
+
+Static analysis has a taxonomy row; this is the ADOPTION RECIPE — earned the day a lint gate's
+maiden run found three latent use-before-define crashes that a 1,100-test suite couldn't see
+(the suite ran the logic; nothing ever *resolved the identifiers* in the JSX layer).
+
+**The gap it closes:** any layer your tests read as text rather than execute (JSX components,
+templates, untyped scripts) can reference a name that doesn't exist — the runtime crash class
+(`ReferenceError`, TDZ, hook-order). Syntax checkers are JSX-blind, bundlers accept undefined
+identifiers as valid syntax, and unit tests never render. Without a gate, the FIRST signal is a
+blank page in production.
+
+**The recipe (five rules, each learned the hard way):**
+1. **Curate correctness-only rules; never adopt a style preset.** `no-undef`,
+   `no-use-before-define`, `jsx-no-undef`, `rules-of-hooks` — and nothing stylistic. A gate whose
+   reds are ever noise gets ignored; a curated gate's every red is a defect.
+2. **Mount it IN the suite** (a `lint.test.js` invoking the linter's Node API) when the project
+   has no CI: the gate then fires with the ritual that already exists (`npm test`) instead of
+   adding a ritual someone must remember. Give it an anti-vacuous floor (assert ≥N files were
+   actually linted — a broken glob otherwise passes on zero files).
+3. **Demand a green baseline, and TRIAGE the maiden run.** First-run hits are findings: fix the
+   code, or record a conscious config decision — never widen the config to get green.
+4. **Falsify before trusting:** plant one bogus reference, watch the gate name it
+   file:line:rule, revert. A guard nobody has seen fire is a hope, not a guard.
+5. **Write the flip condition into the test header:** a red = a real defect in the flagged file
+   (or, rarely, a new legitimate global for the config) — fix the CODE, never widen the config
+   to silence a finding.
+
 ## Choosing what to write (quick decision guide)
 
 | The change is… | Write… |

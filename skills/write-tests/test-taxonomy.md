@@ -40,6 +40,10 @@ Each rung multiplies the value of the rungs below it. Adopt a rung when its trig
 before — premature tooling is maintenance debt.
 
 1. **A solid hermetic unit suite + taxonomy README** — the foundation; everything else assumes it.
+1.5. **The static gate** — *trigger: any codebase layer your tests read as text rather than
+   execute (JSX, templates, untyped scripts), and no CI yet.* Cheap, closes a whole signal-less
+   class; for solo/agentic projects it arrives long BEFORE rung 7 (where lint conventionally
+   lives, inside CI). Recipe in SKILL.md § "The static gate".
 2. **Coverage reporting** (`--coverage`) — *trigger: you're unsure which branches are untested.*
    Read it as a map of gaps; never set a threshold target without understanding Goodhart's law.
 3. **Property-based tests** — *trigger: a function's input space is large (parsers, date math,

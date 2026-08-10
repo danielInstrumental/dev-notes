@@ -141,6 +141,34 @@ the walk down:
 
 ---
 
+## The Chesterton's Fence check (inside Phase 2 — before designing any fix- or removal-shaped change)
+
+Named for the industry's own term: **Chesterton's Fence** — don't remove a fence until you know
+why it was put up. Professional teams enforce this CULTURALLY: reviewers ask "did you check
+blame?", deprecation cycles observe real usage before deletion, and the **scream test** (turn it
+off, see who screams) answers empirically when nothing was written down. Agents don't carry that
+culture — so this skill makes the principle a PROCEDURE.
+
+**Scope:** mandatory for fix-shaped and removal-shaped changes. Pure additions are exempt — but
+say so explicitly, never skip silently.
+
+**The check — establish with RECEIPTS whether the thing exists on purpose. Four sources:**
+project registers / decision docs · plan + implementation history · comments at the site (see
+comment-protocol: fingerprints are this check's SUPPLY SIDE — a fingerprint means decision,
+silence means presumed rot) · `git log -S` / blame for the birth commit.
+
+**Record ONE verdict in the plan:**
+- **Fence HONORED** — a recorded reason exists and the design preserves it.
+- **Fence RESTORED** — the change realigns code with the recorded/evident intent (e.g. config
+  the tests treated as real but the code never read: wire it, don't delete it).
+- **Fence RETIRED** — deliberate once, no longer serving; the plan IS the retirement record, and
+  the site gets a comment saying so.
+- **FOSSIL** — no reason found anywhere; SAY WHERE YOU LOOKED.
+
+A fix-shaped plan with no verdict is not ready for the approval gate. When records are silent
+and the stakes are real, fall back to the culture's empirical tools: deprecate-and-observe, or
+the scream test — measurement substitutes for missing documentation.
+
 ## Phase 3 — Design
 
 - Number every edit (A1, A2, B1 …) with exact file + insertion point, and include the actual code for
