@@ -1,9 +1,9 @@
 // READ-ONLY: read one record by id — any object type, chosen properties, optional associations.
 //
 //   node get-record.js <objectType> <id> [prop1,prop2,...] [assocType1,assocType2,...]
-//   node get-record.js deals 62878719778 dealname,createdate
+//   node get-record.js deals 12345678901 dealname,createdate
 //   node get-record.js contacts 9051 firstname,lastname,email deals
-//   node get-record.js 2-12345678 59093293338 record_name,type
+//   node get-record.js 2-12345678 98765432109 record_name,type
 const TOKEN = require('./_token');
 
 const [objectType, id, props, assocs] = process.argv.slice(2);

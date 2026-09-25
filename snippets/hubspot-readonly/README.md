@@ -2,9 +2,8 @@
 
 Self-contained CLI scripts (Node 18+, zero dependencies) for asking a live HubSpot portal
 one-question grounding queries. **Strictly read-only by construction** — the only POST calls are
-batch-*reads* and search; nothing here creates, updates, or archives anything. Generalized from
-the UMHS project's `.notes/API/` toolkit (2026-07-25); parametrized by object type so they work
-on any portal.
+batch-*reads* and search; nothing here creates, updates, or archives anything. Parametrized by
+object type so they work on any portal.
 
 ## Setup
 

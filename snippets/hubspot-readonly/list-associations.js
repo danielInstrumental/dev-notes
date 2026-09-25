@@ -3,8 +3,8 @@
 // silent-truncation trap; this walks every page and says how many pages it took.
 //
 //   node list-associations.js <fromType> <id> <toType>
-//   node list-associations.js deals 62878719778 contacts
-//   node list-associations.js 2-12345678 59093293338 deals
+//   node list-associations.js deals 12345678901 contacts
+//   node list-associations.js 2-12345678 98765432109 deals
 const TOKEN = require('./_token');
 
 const [fromType, id, toType] = process.argv.slice(2);

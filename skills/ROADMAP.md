@@ -14,7 +14,7 @@ Three standing improvement directions (the lens for every item below):
 
 - [ ] **First real adoption** — onboard the kit into the next project (copy folders, config-block
   interview, CLAUDE.md starter). Fold every friction found back into the kit: unclear config
-  slots, missing steps in the README, skills that read wrong without UMHS context.
+  slots, missing steps in the README, skills that assume context the reader doesn't have.
 
 ## Next
 
@@ -22,8 +22,7 @@ Three standing improvement directions (the lens for every item below):
   lives in 3 places (skills README adoption step · CLAUDE-md-starter · templates folder itself);
   that's our own drift class. Pick ONE source (probably the templates folder) and point the
   others at it.
-- [ ] **Worked examples per skill** (improve) — the UMHS originals referenced real log entries as
-  examples; generalization removed them. Add one small FICTIONAL worked example per skill (a
+- [ ] **Worked examples per skill** (improve) — the formats are described but never shown. Add one small FICTIONAL worked example per skill (a
   sample handoff §3, a sample implementation-log entry). Trigger: the first time an agent or
   reader produces a malformed artifact because the format alone wasn't enough.
 - [ ] **CI gate template** (formalize) — a starter GitHub Actions workflow (run the test suite on
@@ -35,7 +34,7 @@ Three standing improvement directions (the lens for every item below):
 - [ ] **`branch-and-pr` skill** — branch naming, when to open the PR, PR description format, merge
   rules, agent-as-author / human-as-reviewer. *Trigger: the new project adopts feature branches +
   PRs (decided 2026-07-24 to adopt branches early).*
-- [x] ~~Generalize the UMHS CRM/API inspection toolkit~~ — **READ-ONLY half SHIPPED 2026-07-25**
+- [x] ~~HubSpot inspection toolkit~~ — **READ-ONLY half SHIPPED 2026-07-25**
   (`snippets/hubspot-readonly/`: find-property · get-record · search-records · list-associations ·
   find-form · orphan-audit [listing-only] + the token seam). The write half continues below.
 - [ ] **HubSpot WRITE + deeper-inspection helpers** (the deliberate remainder of the toolkit) —
@@ -59,8 +58,8 @@ Three standing improvement directions (the lens for every item below):
   disclosure) — evidence tiers, pre-building under a fork, shipping modes could move to a
   `references.md`. *Trigger: plan-first/SKILL.md grows past ~400 lines or agents demonstrably
   skim past the advanced rules.*
-- [ ] **E2E / browser-automation skill** (formalize) — generalize the UMHS playwright skill (never
-  ported). *Trigger: adopting the E2E rung of the test-taxonomy ladder — manual browser-verify of
+- [ ] **E2E / browser-automation skill** (formalize) — a Playwright-based skill for verifying real user
+  flows in the browser. *Trigger: adopting the E2E rung of the test-taxonomy ladder — manual browser-verify of
   the same flows is eating session time.*
 - [ ] **Ladder-rung notes for gherkin/BDD, property-based, mutation testing** — one reference each
   with tooling + first-run guidance. *Trigger: adopting that rung on a real project (encode what
