@@ -6,10 +6,10 @@ A running notebook of things I learn while building projects.
 
 | Folder | What goes here |
 |---|---|
-| [`glossary/`](glossary/) | Technical terms I need to review, defined in my own words |
-| [`lessons-learned/`](lessons-learned/) | Takeaways from projects — what worked, what broke, what I'd change |
+| [`knowledge/`](knowledge/) | Reference material — the concepts map with own-words deep dives, bug classes, testing |
+| [`kit/`](kit/) | The agent skills kit in Claude Code's native format + templates — see [`kit/README.md`](kit/README.md); install into a project with `kit/install.sh` |
 | [`snippets/`](snippets/) | Reusable code bits and commands |
-| [`skills/`](skills/) | Reusable agent skills in Claude Code's native format — see [`skills/README.md`](skills/README.md) for the full list. Copy into a new project's `.claude/skills/` |
+| [`lessons/`](lessons/) | Takeaways from projects — what worked, what broke, what I'd change |
 
 ## How I use this
 

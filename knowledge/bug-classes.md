@@ -1,11 +1,11 @@
 # Problem Classes — a living map of the ways systems go wrong
 
-Companion to the `prompt-coaching` skill and sibling of `core-vocabulary.md`: that file names the
+Companion to the `prompt-coaching` skill and sibling of the concepts map (`concepts/README.md`): that file names the
 PARTS of a system; this one names the recurring WAYS systems fail — **bug classes**. Knowing the
 class is the professional superpower: once a problem is classified, the known mitigations come
 with the name.
 
-**This map is OPEN, not a syllabus** — same grow-rules as `core-vocabulary.md` (see the bottom).
+**This map is OPEN, not a syllabus** — same grow-rules as the concepts map (see the bottom).
 Whole families are missing by design (security, performance, distributed systems each have their
 own catalog); they get added when a project meets them.
 
@@ -233,8 +233,8 @@ a project meets them (grow-rules).
 
 ## How this file grows (open by design)
 
-Same rules as `core-vocabulary.md`: when a session hits a bug that belongs to a class not on this
+Same rules as the concepts map (`concepts/README.md`): when a session hits a bug that belongs to a class not on this
 map, **ADD the class** (with its symptom and mitigations) — adding is the default; new families
 are expected (security, performance, distributed systems…); keep entries one-recognition-card
-each; upstream first (add here in dev-notes, re-copy to projects); and the coaching duty applies —
+each; upstream first (add here in dev-notes, then `kit/install.sh <project> --update`); and the coaching duty applies —
 **when a bug is diagnosed in a session, NAME its class out loud**, so recognition becomes reflex.

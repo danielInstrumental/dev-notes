@@ -1,6 +1,6 @@
 # Test Taxonomy — reference
 
-Companion to `SKILL.md`. Two sections: the kinds of tests (conventional first, then agentic
+Companion to the `write-tests` skill. Two sections: the kinds of tests (conventional first, then agentic
 extensions), and the growth ladder for adopting heavier tooling deliberately.
 
 ## Conventional kinds (industry-standard vocabulary)
@@ -24,7 +24,7 @@ Supporting process conventions: tests run in **CI** on every push (red blocks me
 reports find untested branches (never a target) · **flaky** tests are quarantined and fixed, not
 retried forever.
 
-## Agentic extensions (constraints on code evolution — see SKILL.md for rules)
+## Agentic extensions (constraints on code evolution — see the `write-tests` skill for rules)
 
 | Kind | What it proves | When to write one |
 |---|---|---|
@@ -43,7 +43,7 @@ before — premature tooling is maintenance debt.
 1.5. **The static gate** — *trigger: any codebase layer your tests read as text rather than
    execute (JSX, templates, untyped scripts), and no CI yet.* Cheap, closes a whole signal-less
    class; for solo/agentic projects it arrives long BEFORE rung 7 (where lint conventionally
-   lives, inside CI). Recipe in SKILL.md § "The static gate".
+   lives, inside CI). Recipe in the `write-tests` skill § "The static gate".
 2. **Coverage reporting** (`--coverage`) — *trigger: you're unsure which branches are untested.*
    Read it as a map of gaps; never set a threshold target without understanding Goodhart's law.
 3. **Property-based tests** — *trigger: a function's input space is large (parsers, date math,

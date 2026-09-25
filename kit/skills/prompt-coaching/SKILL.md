@@ -46,7 +46,7 @@ note covering:
    invariant).
 4. **Underlying concept** — When instructive, explain the engineering concept behind the term, not
    just the word (I'm learning the ideas, not memorizing vocabulary). **When a session hits a bug,
-   NAME its class** (see `problem-classes.md` — e.g. "this is a check-then-act race") so I learn to
+   NAME its class** (see `.claude/knowledge/bug-classes.md` — e.g. "this is a check-then-act race") so I learn to
    recognize recurring failure shapes, and add the class to the map if it's missing.
 5. **Improved prompt (ALWAYS include)** — Always end the coaching note with a **full, ready-to-use
    rewrite of my prompt** that incorporates every suggestion above (fixed scope, vocabulary, typos,
@@ -68,12 +68,12 @@ note covering:
 
 ## Related
 
-- `core-vocabulary.md` (this folder) — the **living map** of concept families the coaching draws
+- `.claude/knowledge/concepts/README.md` — the **living map** of concept families the coaching draws
   from when naming unknown unknowns: conventional terms unmarked, house-style terms flagged with
   their professional translation. **It is open by design — when coaching surfaces a term not on
   the map, add it** (see the file's grow-rules).
-- `problem-classes.md` (this folder) — the sibling living map of **bug classes** (the recurring
+- `.claude/knowledge/bug-classes.md` — the sibling living map of **bug classes** (the recurring
   ways systems fail), organized for recognition: symptom → class name → standard mitigations.
   Same grow-rules; when a session's bug fits a class, name it — when it doesn't, add the class.
 - A per-project glossary (project-specific terminology, defined in my own words) pairs well with
-  this loop — see the `glossary/` folder in this repo for the running cross-project version.
+  this loop — the running cross-project version is the deep-dive files in `.claude/knowledge/concepts/`.

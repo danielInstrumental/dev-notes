@@ -4,7 +4,7 @@
      Now / Next / Later sections · every Later item carries a REVISIT TRIGGER · items graduate
      out when done (note the commit) · adding requires a trigger or a felt pain — speculative
      items are bloat, the thing this kit exists to prevent. Upstream-first applies: improvements
-     land here in dev-notes, then re-copy to projects. -->
+     land here in dev-notes, then `kit/install.sh <project> --update`. -->
 
 Three standing improvement directions (the lens for every item below):
 **simplify** (fewer words, fewer duplicates) · **generalize** (convention over house style) ·

@@ -9,8 +9,12 @@ that writing skill #6 is mechanical, not a design exercise.
   skill is an action (`write-handoff`, `log-implementation`), noun allowed when it's a phase or a
   standing mode (`session-startup`, `prompt-coaching`).
 - The name is what users type (`/write-handoff`) — keep it short, unambiguous, and sayable.
-- The instruction file is always `SKILL.md`. Supporting reference files live in the same folder
-  with descriptive kebab-case names (`change-impact-checklist.md`).
+- The instruction file is always `SKILL.md`. Supporting files that only that skill's procedure
+  uses live in the same folder with descriptive kebab-case names (`change-impact-checklist.md`).
+- Reference **knowledge** — anything worth reading outside the skill (concepts, bug classes, the
+  testing ladder) — lives in the repo's `knowledge/` folder instead, and skills cite it at its
+  installed path, `.claude/knowledge/<file>`. Skills are instructions; knowledge is what they
+  draw on.
 
 ## Frontmatter
 
@@ -72,7 +76,7 @@ When a project teaches a lesson that improves a skill:
 2. **Edit the skill here in dev-notes first**, folded into the section where it belongs — not as a
    dated addendum at the bottom (addenda are how the originals grew inside one project; the kit
    stays consolidated).
-3. Re-copy the updated skill into active projects when convenient.
+3. Re-install into active projects when convenient: `kit/install.sh <project> --update`.
 
-A lesson worth a longer story also gets an entry in `lessons-learned/` — the skill carries the
+A lesson worth a longer story also gets an entry in `lessons/` — the skill carries the
 distilled rule; the lesson file carries the narrative.

@@ -5,12 +5,28 @@ draws from when naming the user's unknown unknowns — organized so growth has s
 
 **This map is OPEN, not a syllabus.** These families and terms are a starting core, not the whole
 of engineering vocabulary. It grows as projects surface new concepts — see "How this file grows"
-at the bottom. No term is "done": the user's own definitions live in the repo's `glossary/`
-folder; this file just says what exists and whether it's conventional.
+at the bottom. No term is "done": the user's own definitions live in the deep-dive files
+in this folder (listed below); this file just says what exists and whether it's conventional.
 
 **Markers:** unmarked = canonical professional vocabulary · 🏠 = house style (coined in the
 user's projects — useful, but translate it when talking to other engineers; the translation is
 given in parentheses).
+
+## Deep dives (the user's own-words definitions)
+
+Grouped by topic so each file is a short, reviewable set. Terms below that have a deep dive
+point to it with a `→ [[file#Heading]]` link.
+
+| File | Covers |
+|---|---|
+| [functions-and-effects.md](functions-and-effects.md) | Pure function, side effect, attribution rule, functional core/imperative shell, idempotency (and idempotent ≠ pure) |
+| [state-and-data.md](state-and-data.md) | Source of truth, derived state, projection, cache/stale, invariant, implicit contract, consumers/downstream |
+| [correctness-and-drift.md](correctness-and-drift.md) | DRY / single source of truth, drift (schema/config/client-server), reference trace, orphaned reference, dead code, false match |
+| [enforcement-and-safety.md](enforcement-and-safety.md) | Guard, backstop, defense-in-depth, client vs server validation, fail-open/closed, eventual vs read-after-write consistency |
+| [data-flow.md](data-flow.md) | Write/read path, hop, propagation, end-to-end tracing, debounce, event bus |
+| [data-modeling.md](data-modeling.md) | Scalar vs collection, cardinality, embedded/denormalized vs normalized, discriminated union, upsert, reconcile |
+
+_Definitions are project-neutral. They started as notes from real projects, but the project-specific detail is deliberately stripped out here._
 
 ---
 
@@ -79,7 +95,7 @@ given in parentheses).
   allowlists)
 - **OWASP Top 10 / STRIDE / CWE** — the canonical catalogs and taxonomy of vulnerability classes;
   the professional shared vocabulary for this family (see the Security family in
-  `problem-classes.md`)
+  `../bug-classes.md`)
 
 ## Change over time — how code evolves
 
@@ -185,9 +201,9 @@ Rules for any agent maintaining it:
    family if none fits. Adding is the default, not the exception.
 2. **Mark its status honestly**: canonical (unmarked) or 🏠 house style with the conventional
    translation in parentheses. If unsure it's canonical, say so rather than guessing.
-3. **One-line definitions only** — the user's fuller own-words definitions belong in the repo's
-   `glossary/` folder, not here. This file is the index of what exists.
-4. **Upstream first** (see `AUTHORING.md`): add terms here in dev-notes, then re-copy to projects —
+3. **One-line definitions only** — the user's fuller own-words definitions belong in the deep-dive
+   files in this folder, not here. This file is the index of what exists.
+4. **Upstream first** (see `AUTHORING.md`): add terms here in dev-notes, then `kit/install.sh <project> --update` —
    a term learned in one project should reach all of them.
 5. **House terms must stay load-bearing.** A 🏠 term earns its place by being USED — by a skill in
    this kit or an active project. If nothing uses it anymore, drop it from the map (canonical terms
