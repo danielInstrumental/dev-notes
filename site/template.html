@@ -187,11 +187,24 @@
     font: 400 .86em/1 var(--mono); background: var(--accent-soft); color: var(--ink);
     border-radius: 3px; padding: .12em .32em;
   }
+  .prose pre {
+    overflow-x: auto; margin-block: 1rem; padding: .85rem 1rem; background: var(--surface);
+    border: 1px solid var(--line); border-radius: 7px; font: 400 .8rem/1.55 var(--mono);
+  }
+  .prose pre code { background: none; padding: 0; font-size: inherit; line-height: inherit; }
   .prose blockquote { margin-inline: 0; padding: .6rem 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
   .prose blockquote p { margin: 0; }
   .prose table { display: block; overflow-x: auto; border-collapse: collapse; font-size: .9rem; margin-block: 1rem; max-width: 100%; }
   .prose th, .prose td { text-align: left; vertical-align: top; padding: .5rem .8rem .5rem 0; border-bottom: 1px solid var(--line); }
   .prose th { font-weight: 600; font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: var(--faint); }
+
+  /* ── inbox ── */
+  .note-meta { margin: 1rem 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+  .tag { font: 500 .74rem/1 var(--mono); color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: .3rem .45rem; }
+  .status { font: 600 .66rem/1 var(--sans); text-transform: uppercase; letter-spacing: .08em; border-radius: 3px; padding: .3rem .4rem .25rem; color: var(--accent); background: var(--accent-soft); }
+  .status.is-done { color: var(--faint); background: none; border: 1px dashed var(--line); }
+  .nav .note-date { font: 400 .72rem/1.9 var(--mono); color: var(--faint); white-space: nowrap; }
+  .nav .note-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
   /* ── page turn ── */
   .page-turn { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 4rem; }
@@ -244,7 +257,7 @@
     </div>
     <label class="search">
       <svg viewBox="0 0 16 16" fill="none" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="m11 11 3.5 3.5" stroke-linecap="round"/></svg>
-      <input id="q" type="search" placeholder="Search concepts" autocomplete="off" spellcheck="false" aria-label="Search terms and explanations">
+      <input id="q" type="search" placeholder="Search concepts and notes" autocomplete="off" spellcheck="false" aria-label="Search terms and explanations">
       <kbd aria-hidden="true">/</kbd>
     </label>
     <nav class="nav" id="nav" aria-label="Sections"></nav>
@@ -267,6 +280,7 @@ const chapterById = Object.fromEntries(DATA.chapters.map((c) => [c.id, c]));
 const partByNum = Object.fromEntries(DATA.parts.map((p) => [p.num, p]));
 const allTerms = DATA.chapters.flatMap((c) => c.terms.map((t) => ({ ...t, chapter: c })));
 const chapterOfTerm = Object.fromEntries(allTerms.map((t) => [t.id, t.chapter.id]));
+const noteById = Object.fromEntries(DATA.notes.map((n) => [n.id, n]));
 const partTerms = (p) => p.chapters.reduce((n, id) => n + chapterById[id].terms.length, 0);
 
 // ── sidebar: the book's contents, one accordion per part ──
@@ -288,9 +302,12 @@ $('#nav').innerHTML =
         <span class="ch"><span class="ch-num">${c.num}</span><span class="ch-title">${esc(c.title)}</span></span>
         <span class="n">${c.terms.length || '–'}</span></a></li>`;
     }).join(''))).join('') +
+  `<p class="nav-label">Inbox</p>` +
+  group('inbox', 'Notes', DATA.notes.length, DATA.notes.map((n) => `<li><a href="#${n.id}" data-view="${n.id}" title="${esc(n.title)}">
+      <span class="note-title">${esc(n.title)}</span><span class="note-date">${esc(n.date.slice(5))}</span></a></li>`).join('')) +
   `<p class="nav-label">Later</p>` +
   group('later', 'Coming later', SOON.length, SOON.map((name) => `<li class="soon"><span>${name}</span></li>`).join(''));
-$('#built').innerHTML = `Built ${esc(DATA.built)} from ${esc(DATA.commit)}.<br>Edit the markdown in knowledge/, then rebuild.`;
+$('#built').innerHTML = `Built ${esc(DATA.built)} from ${esc(DATA.commit)}.<br>Edit the markdown in knowledge/ or inbox/, then rebuild.`;
 
 // Accordion state: remembered in this browser (a convenience, so storage failing is fine).
 // The part you're reading opens by itself; one you open or close by hand stays that way.
@@ -307,8 +324,8 @@ document.querySelectorAll('.group').forEach((g) => setGroup(g.dataset.group, Boo
 let activeGroup = null;
 function openGroupFor(v) {
   const c = chapterById[v];
-  if (!c) return;   // the contents page belongs to no single part
-  const id = `part-${c.part}`;
+  if (!c && !noteById[v]) return;   // the contents page belongs to no single group
+  const id = c ? `part-${c.part}` : 'inbox';
   if (id === activeGroup) return;
   if (activeGroup) setGroup(activeGroup, false);
   setGroup(id, true);
@@ -394,8 +411,23 @@ function renderChapter(c) {
     </nav>`;
 }
 
+function renderNote(n) {
+  const done = !/^active/i.test(n.status);
+  main.innerHTML = `
+    <header class="view-head">
+      <p class="eyebrow">Inbox · ${esc(n.date)}</p>
+      <h1>${esc(n.title)}</h1>
+      <p class="note-meta"><span class="status ${done ? 'is-done' : ''}">${esc(n.status)}</span>${n.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</p>
+    </header>
+    ${n.intro ? `<div class="prose">${n.intro}</div>` : ''}
+    ${n.sections.map((s) => `<section class="dd-section" id="${s.id}"><h3>${s.heading}</h3><div class="prose">${s.html}</div></section>`).join('')}`;
+}
+
 // ── search: every word must appear in a term's name/definition or an explanation's text ──
-const sectionIndex = DATA.chapters.flatMap((c) => c.sections.map((s) => ({ anchor: s.id, chapter: c, heading: s.plain, text: s.text })));
+const sectionIndex = [
+  ...DATA.chapters.flatMap((c) => c.sections.map((s) => ({ anchor: s.id, crumb: crumb(c), heading: s.plain, text: s.text }))),
+  ...DATA.notes.flatMap((n) => n.sections.map((s) => ({ anchor: s.id, crumb: `<span class="crumb-part">Inbox</span><span aria-hidden="true">›</span><span>${esc(n.title)}</span>`, heading: s.plain, text: s.text }))),
+];
 
 function highlight(str, words) {
   const safe = esc(str);
@@ -419,7 +451,7 @@ function renderSearch(query) {
     .sort((a, b) => a.rank - b.rank)
     .map(({ t }) => t);
   const found = sectionIndex.filter((s) => has(`${s.heading} ${s.text}`));
-  const summary = [terms.length && plural(terms.length, 'term'), found.length && plural(found.length, 'deep dive')].filter(Boolean).join(' · ');
+  const summary = [terms.length && plural(terms.length, 'term'), found.length && plural(found.length, 'section')].filter(Boolean).join(' · ');
   main.innerHTML = `
     <header class="view-head">
       <p class="eyebrow">Search</p>
@@ -427,11 +459,11 @@ function renderSearch(query) {
       <p class="lede">${summary || 'No matches.'}</p>
     </header>
     <div class="results">
-      ${!terms.length && !found.length ? `<p class="empty">Search looks at term names, their one-line definitions and the deep dives. Try fewer words, or part of a word.</p>` : ''}
+      ${!terms.length && !found.length ? `<p class="empty">Search looks at term names, their one-line definitions, the deep dives and the inbox. Try fewer words, or part of a word.</p>` : ''}
       ${terms.length ? `<header class="block-head"><h2>Terms</h2><span class="count">${terms.length}</span></header>${terms.map((t) => termHTML(t, words)).join('')}` : ''}
-      ${found.length ? `<header class="block-head"><h2>In the deep dives</h2><span class="count">${found.length}</span></header>${found.map((s) => `
+      ${found.length ? `<header class="block-head"><h2>In the deep dives and inbox</h2><span class="count">${found.length}</span></header>${found.map((s) => `
         <a class="hit" href="#${s.anchor}">
-          <span class="crumb">${crumb(s.chapter)}</span>
+          <span class="crumb">${s.crumb}</span>
           <span class="hit-where">${highlight(s.heading, words)}</span>
           <span class="hit-snip">${snippet(s.text, words)}</span>
         </a>`).join('')}` : ''}
@@ -445,10 +477,12 @@ let view = null;
 let first = true;
 function route() {
   const hash = decodeURIComponent(location.hash.slice(1)) || 'concepts';
-  const chapter = chapterById[hash.split('--')[0]] ?? chapterById[chapterOfTerm[hash]];
-  const next = chapter ? chapter.id : 'concepts';
+  const base = hash.split('--')[0];
+  const chapter = chapterById[base] ?? chapterById[chapterOfTerm[hash]];
+  const note = noteById[base];
+  const next = chapter ? chapter.id : note ? note.id : 'concepts';
   if (next !== view) {
-    if (chapter) renderChapter(chapter); else renderContents();
+    if (chapter) renderChapter(chapter); else if (note) renderNote(note); else renderContents();
     view = next;
   }
   setCurrent(next);

@@ -9,7 +9,7 @@
 //
 // The page mirrors the files: knowledge/concepts/README.md is the table of contents (parts →
 // chapters), and each chapter file is one page — its Covers line, its Terms list, then its
-// own-words explanations (the ## sections below the Terms).
+// own-words explanations (the ## sections below the Terms). inbox/ notes each become a page too.
 //
 // It fails loudly: a chapter missing from the contents, a line it can't parse, or a [[link]] that
 // points nowhere stops the build with a message. A broken note should block the page, not silently
@@ -177,16 +177,53 @@ const chapters = toc.map((c) => ({
   sections: parseSections(raw[c.id].rest, c.id),
 }));
 
-// ── 5. Fill the template ──
+// ── 5. The inbox: one note per file, newest first; header lines give Date, Tags, Status ──
+
+const INBOX = 'inbox/';
+const notes = readdirSync(new URL(INBOX, ROOT))
+  .filter((f) => f.endsWith('.md') && f !== 'README.md')
+  .map((f) => {
+    const where = INBOX + f;
+    const md = read(where);
+    const field = (name, required) => {
+      const m = md.match(new RegExp(`^\\*\\*${name}:\\*\\* (.+)$`, 'm'));
+      return m ? m[1].trim() : required ? fail(`${where} has no "**${name}:**" line`) : '';
+    };
+    const id = 'n-' + slug(f.replace(/\.md$/, ''));
+    const body = md.replace(/^# .+$/m, '').replace(/^\*\*(Date|Tags|Status):\*\* .+$/gm, '').trim();
+    const tokens = marked.lexer(body);
+    const intro = [];
+    const sections = [];
+    for (const t of tokens) {
+      if (t.type === 'heading' && t.depth === 2) {
+        const heading = marked.parseInline(t.text);
+        sections.push({ id: `${id}--${slug(norm(t.text))}`, heading, plain: plain(heading), tokens: [] });
+      } else (sections.at(-1)?.tokens ?? intro).push(t);
+    }
+    const render = (toks) => marked.parser(Object.assign(toks, { links: tokens.links }));
+    return {
+      id,
+      title: (md.match(/^# (.+)$/m) ?? fail(`${where} has no # title`))[1],
+      date: field('Date', true),
+      tags: field('Tags', false).split('·').map((t) => t.trim()).filter(Boolean),
+      status: field('Status', true),
+      intro: render(intro),
+      sections: sections.map(({ tokens: toks, ...s }) => { const html = render(toks); return { ...s, html, text: plain(html) }; }),
+    };
+  })
+  .sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title));
+
+// ── 6. Fill the template ──
 
 const repo = fileURLToPath(ROOT);
 const git = (cmd) => { try { return execSync(`git ${cmd}`, { cwd: repo }).toString().trim(); } catch { return ''; } };
-const edited = git('status --porcelain -- knowledge') !== '';
+const edited = git('status --porcelain -- knowledge inbox') !== '';
 const data = {
   built: new Date().toISOString().slice(0, 10),
   commit: (git('rev-parse --short HEAD') || 'unknown') + (edited ? ' + local edits' : ''),
   parts,
   chapters,
+  notes,
 };
 const json = JSON.stringify(data).replace(/</g, '\\u003c');   // can't close the <script> early
 const SLOT = 'const DATA = __DATA__;';
@@ -201,4 +238,4 @@ const terms = chapters.flatMap((c) => c.terms);
 const empty = chapters.filter((c) => !c.terms.length).length;
 console.log(`built site/dist/dev-notes.html — ${terms.length} terms in ${chapters.length} chapters ` +
   `(${empty} empty) across ${parts.length} parts, ${chapters.reduce((n, c) => n + c.sections.length, 0)} explanations, ` +
-  `${terms.filter((t) => t.deep.length).length} terms linked to one`);
+  `${terms.filter((t) => t.deep.length).length} terms linked to one; ${notes.length} inbox note${notes.length === 1 ? '' : 's'}`);
