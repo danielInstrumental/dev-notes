@@ -1,0 +1,12 @@
+{
+  "name": "dev-notes-site",
+  "private": true,
+  "type": "module",
+  "description": "Builds the dev-notes reference page from the markdown in knowledge/",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "marked": "18.0.14"
+  }
+}

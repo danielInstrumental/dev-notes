@@ -1,0 +1,415 @@
+<meta charset="utf-8">
+<title>Dev Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<!-- Page design + behavior. Content is NOT written here: build.mjs fills the DATA line in the script from the markdown. -->
+<style>
+  :root {
+    --bg: #f3f4f7;
+    --surface: #ffffff;
+    --ink: #171a21;
+    --muted: #586070;
+    --faint: #878e9d;
+    --line: #dcdfe6;
+    --accent: #3244b5;
+    --accent-soft: #e7eaf8;
+    --house: #93560b;
+    --house-soft: #f6ebdc;
+    --mark: #ffe28a;
+    --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+    --sans: "IBM Plex Sans", "Helvetica Neue", "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #0f1117; --surface: #171a22; --ink: #e6e8ee; --muted: #a2a9b7; --faint: #6e7585;
+      --line: #292d38; --accent: #9ba9ff; --accent-soft: #1d2240; --house: #e2a757;
+      --house-soft: #2d2317; --mark: #5e4f10;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0f1117; --surface: #171a22; --ink: #e6e8ee; --muted: #a2a9b7; --faint: #6e7585;
+    --line: #292d38; --accent: #9ba9ff; --accent-soft: #1d2240; --house: #e2a757;
+    --house-soft: #2d2317; --mark: #5e4f10;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font: 400 15px/1.6 var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+  mark { background: var(--mark); color: inherit; border-radius: 2px; padding-inline: 1px; }
+
+  /* ── shell: sidebar + main ── */
+  .shell {
+    display: grid; grid-template-columns: 16.5rem minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 4rem);
+    max-width: 78rem; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px);
+  }
+  .side {
+    position: sticky; top: env(safe-area-inset-top, 0px); align-self: start;
+    height: 100vh; overflow-y: auto; padding-block: 1.75rem 1.5rem;
+    display: flex; flex-direction: column; gap: 1.25rem;
+  }
+  .brand { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; }
+  .brand a { font: 700 1.2rem/1 var(--display); color: var(--ink); text-decoration: none; letter-spacing: -.01em; }
+  .menu { display: none; }
+  .search { position: relative; }
+  .search input {
+    width: 100%; font: inherit; font-size: .93rem; color: var(--ink);
+    background: var(--surface); border: 1px solid var(--line); border-radius: 7px;
+    padding: .55rem .75rem .55rem 2.1rem;
+  }
+  .search input::placeholder { color: var(--faint); }
+  .search input:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+  .search svg { position: absolute; left: .7rem; top: 50%; translate: 0 -50%; width: 15px; height: 15px; stroke: var(--faint); }
+  .search kbd {
+    position: absolute; right: .6rem; top: 50%; translate: 0 -50%;
+    font: 500 .72rem/1 var(--mono); color: var(--faint); border: 1px solid var(--line); border-radius: 4px; padding: .2rem .35rem;
+  }
+  .nav { display: flex; flex-direction: column; gap: 1.25rem; }
+  .nav h2 {
+    margin: 0 0 .35rem; font: 600 .7rem/1 var(--sans); text-transform: uppercase; letter-spacing: .12em; color: var(--faint);
+  }
+  .nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .nav a, .nav .soon {
+    display: flex; justify-content: space-between; gap: .5rem;
+    padding: .28rem .55rem; margin-inline: -.55rem; border-radius: 5px;
+    color: var(--muted); text-decoration: none; font-size: .9rem;
+  }
+  .nav a:hover { color: var(--ink); background: var(--surface); }
+  .nav a[aria-current="true"] { color: var(--accent); background: var(--accent-soft); font-weight: 500; }
+  .nav .n { font: 400 .75rem/1.9 var(--mono); color: var(--faint); font-variant-numeric: tabular-nums; }
+  .nav .sub a { padding-left: 1.3rem; font-size: .86rem; }
+  .nav .soon { color: var(--faint); }
+  .nav .soon span:last-child { font-size: .72rem; }
+  .built { margin-top: auto; font: 400 .72rem/1.5 var(--mono); color: var(--faint); }
+
+  /* ── main column ── */
+  main { padding-block: 2.5rem 6rem; max-width: 50rem; min-width: 0; }
+  .view-head { margin-bottom: 2.25rem; }
+  .eyebrow { margin: 0 0 .5rem; font: 600 .72rem/1 var(--sans); text-transform: uppercase; letter-spacing: .12em; color: var(--accent); }
+  h1 { margin: 0 0 .75rem; font: 700 clamp(2rem, 4.5vw, 2.7rem)/1.05 var(--display); letter-spacing: -.025em; text-wrap: balance; }
+  .lede { margin: 0; max-width: 62ch; color: var(--muted); font-size: 1.02rem; }
+  .meta { margin: .9rem 0 0; font: 400 .8rem/1.5 var(--mono); color: var(--faint); font-variant-numeric: tabular-nums; }
+  .legend { margin: 1rem 0 0; display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; color: var(--muted); font-size: .88rem; }
+
+  /* ── concepts: families of terms ── */
+  .family { margin-top: 3rem; scroll-margin-top: 1.5rem; }
+  .fam-head { display: flex; align-items: baseline; gap: .75rem; flex-wrap: wrap; padding: 0 .6rem .6rem; margin-inline: -.6rem; border-bottom: 2px solid var(--ink); }
+  .fam-head h2 { margin: 0; font: 700 1.45rem/1.2 var(--display); letter-spacing: -.015em; }
+  .fam-head p { margin: 0; color: var(--muted); font-style: italic; }
+  .fam-head .count { margin-left: auto; font: 400 .78rem/1 var(--mono); color: var(--faint); }
+
+  .term {
+    display: grid; grid-template-columns: 12.5rem minmax(0, 1fr); gap: .2rem 1.5rem;
+    padding: .85rem .6rem; margin-inline: -.6rem; border-bottom: 1px solid var(--line);
+    scroll-margin-top: 1.5rem; border-radius: 4px;
+  }
+  .term:target { animation: flash 2.4s ease-out; }
+  @keyframes flash { from { background: var(--accent-soft); } to { background: transparent; } }
+  .term-name {
+    margin: 0; font: 500 .92rem/1.55 var(--mono); color: var(--ink); overflow-wrap: anywhere;
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem .45rem;
+  }
+  .term-body { min-width: 0; }
+  .term-body > p { margin: 0; }
+  .xlat { color: var(--house); }
+  .xlat + .def { margin-top: .2rem; }
+  .fam-label { font: 400 .75rem/1.5 var(--sans); color: var(--faint); }
+  .house {
+    font: 600 .62rem/1 var(--sans); text-transform: uppercase; letter-spacing: .08em;
+    color: var(--house); background: var(--house-soft); border-radius: 3px; padding: .25rem .35rem .2rem;
+    translate: 0 -1px;
+  }
+  .deep-toggle {
+    margin-top: .45rem; display: inline-flex; align-items: baseline; gap: .4rem; flex-wrap: wrap;
+    font: 500 .84rem/1.4 var(--sans); color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; text-align: left;
+  }
+  .deep-toggle .where { color: var(--faint); font-weight: 400; }
+  .chev { width: .45rem; height: .45rem; border: solid currentColor; border-width: 0 1.5px 1.5px 0; rotate: -45deg; translate: 0 -1px; transition: rotate .15s; flex: none; }
+  .deep-toggle[aria-expanded="true"] .chev { rotate: 45deg; translate: 0 -3px; }
+  .deep {
+    margin-top: .6rem; padding: .9rem 1.1rem; background: var(--surface);
+    border: 1px solid var(--line); border-radius: 7px; font-size: .93rem;
+  }
+  .deep .open { display: inline-block; margin-top: .75rem; font-size: .84rem; font-weight: 500; }
+
+  /* ── deep-dive topic page + rendered markdown ── */
+  .backlinks { margin: 1.1rem 0 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: .4rem; font-size: .86rem; color: var(--faint); }
+  .backlinks a {
+    font: 500 .8rem/1 var(--mono); text-decoration: none; color: var(--ink);
+    background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: .3rem .45rem;
+  }
+  .backlinks a:hover { border-color: var(--accent); color: var(--accent); }
+  .dd-section { margin-top: 2.5rem; scroll-margin-top: 1.5rem; }
+  .dd-section:target h2 { color: var(--accent); }
+  .dd-section h2 { margin: 0 0 .6rem; font: 700 1.35rem/1.25 var(--display); letter-spacing: -.01em; text-wrap: balance; }
+  .prose { max-width: 68ch; }
+  .prose > :first-child { margin-top: 0; }
+  .prose > :last-child { margin-bottom: 0; }
+  .prose p, .prose ul, .prose ol, .prose blockquote { margin-block: .7rem; }
+  .prose ul, .prose ol { padding-left: 1.2rem; }
+  .prose li { margin-block: .3rem; }
+  .prose li::marker { color: var(--faint); }
+  .prose strong { font-weight: 600; }
+  .prose code {
+    font: 400 .86em/1 var(--mono); background: var(--accent-soft); color: var(--ink);
+    border-radius: 3px; padding: .12em .32em;
+  }
+  .prose blockquote { margin-inline: 0; padding: .6rem 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+  .prose blockquote p { margin: 0; }
+  .prose table { display: block; overflow-x: auto; border-collapse: collapse; font-size: .9rem; margin-block: 1rem; max-width: 100%; }
+  .prose th, .prose td { text-align: left; vertical-align: top; padding: .5rem .8rem .5rem 0; border-bottom: 1px solid var(--line); }
+  .prose th { font-weight: 600; font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: var(--faint); }
+  .prose td:first-child { white-space: nowrap; }
+  .deep .prose td:first-child, .deep td:first-child { white-space: normal; }
+
+  /* ── search results ── */
+  .results h2 { margin: 2.5rem 0 .4rem; font: 600 .72rem/1 var(--sans); text-transform: uppercase; letter-spacing: .12em; color: var(--faint); }
+  .hit { display: block; padding: .8rem .6rem; margin-inline: -.6rem; border-bottom: 1px solid var(--line); text-decoration: none; color: var(--ink); border-radius: 4px; }
+  .hit:hover { background: var(--surface); }
+  .hit-where { display: block; font-weight: 600; color: var(--accent); font-size: .92rem; }
+  .hit-where span { color: var(--faint); font-weight: 400; }
+  .hit-snip { display: block; color: var(--muted); font-size: .9rem; margin-top: .15rem; }
+  .empty { color: var(--muted); }
+
+  @media (max-width: 860px) {
+    .shell { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .side { position: static; height: auto; padding-block: 1rem .5rem; gap: .85rem; border-bottom: 1px solid var(--line); }
+    .menu {
+      display: inline-flex; font: 500 .85rem/1 var(--sans); color: var(--ink); background: var(--surface);
+      border: 1px solid var(--line); border-radius: 6px; padding: .45rem .7rem; cursor: pointer;
+    }
+    .search kbd, .built { display: none; }
+    .nav { display: none; padding-bottom: .75rem; }
+    .nav-open .nav { display: flex; }
+    main { padding-block: 1.75rem 4rem; }
+  }
+  @media (max-width: 560px) {
+    .term { grid-template-columns: minmax(0, 1fr); }
+    .fam-head .count { margin-left: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .term:target { animation: none; background: var(--accent-soft); }
+    .chev { transition: none; }
+  }
+</style>
+
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <a href="#concepts">dev-notes</a>
+      <button class="menu" type="button" id="menu" aria-expanded="false" aria-controls="nav">Browse</button>
+    </div>
+    <label class="search">
+      <svg viewBox="0 0 16 16" fill="none" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="m11 11 3.5 3.5" stroke-linecap="round"/></svg>
+      <input id="q" type="search" placeholder="Search terms and notes" autocomplete="off" spellcheck="false" aria-label="Search terms and notes">
+      <kbd aria-hidden="true">/</kbd>
+    </label>
+    <nav class="nav" id="nav" aria-label="Sections"></nav>
+    <p class="built" id="built"></p>
+  </aside>
+  <main id="main"></main>
+</div>
+
+<script>
+const DATA = __DATA__;
+
+const $ = (sel) => document.querySelector(sel);
+const main = $('#main');
+const q = $('#q');
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const topicById = Object.fromEntries(DATA.topics.map((t) => [t.id, t]));
+const allTerms = DATA.families.flatMap((f) => f.terms.map((t) => ({ ...t, family: f })));
+const backlinks = {};   // topic id → map terms that point into it
+for (const t of allTerms) for (const d of t.deep) (backlinks[d.topic] ??= []).some((b) => b.id === t.id) || backlinks[d.topic].push(t);
+
+// ── sidebar ──
+$('#nav').innerHTML = `
+  <div>
+    <h2>Knowledge</h2>
+    <ul>
+      <li><a href="#concepts" data-view="concepts"><span>Concepts</span><span class="n">${allTerms.length}</span></a>
+        <ul class="sub">${DATA.families.map((f) => `<li><a href="#${f.id}" data-fam="${f.id}"><span>${esc(f.name)}</span><span class="n">${f.terms.length}</span></a></li>`).join('')}</ul></li>
+      <li class="soon"><span>Bug classes</span><span>not built yet</span></li>
+      <li class="soon"><span>Testing</span><span>not built yet</span></li>
+    </ul>
+  </div>
+  <div>
+    <h2>Your notes</h2>
+    <ul>${DATA.topics.map((t) => `<li><a href="#${t.id}" data-view="${t.id}"><span>${esc(t.title)}</span></a></li>`).join('')}</ul>
+  </div>
+  <div>
+    <h2>Later</h2>
+    <ul>${['Skills kit', 'Snippets', 'Lessons'].map((s) => `<li class="soon"><span>${s}</span><span>not built yet</span></li>`).join('')}</ul>
+  </div>`;
+$('#built').innerHTML = `Built ${esc(DATA.built)} from ${esc(DATA.commit)}.<br>Edit the markdown in knowledge/, then rebuild.`;
+
+// ── one term row ──
+function termHTML(t, words) {
+  const name = words ? highlight(t.name, words) : esc(t.name);
+  const deep = t.deep.map((d, i) => `
+    <button class="deep-toggle" type="button" aria-expanded="false" aria-controls="${t.id}-d${i}">
+      <span class="chev" aria-hidden="true"></span>Your notes<span class="where">${esc(topicById[d.topic].title)}${d.anchor === d.topic ? '' : ' › ' + esc(d.label)}</span>
+    </button>
+    <div class="deep" id="${t.id}-d${i}" hidden>
+      <div class="prose">${d.html}</div>
+      <a class="open" href="#${d.anchor}">Open ${esc(topicById[d.topic].title)} →</a>
+    </div>`).join('');
+  return `<article class="term" id="${t.id}">
+    <h3 class="term-name">${name}${t.house ? '<span class="house" title="House term: coined in my projects">house</span>' : ''}</h3>
+    <div class="term-body">
+      ${words ? `<span class="fam-label">${esc(t.family.name)}</span>` : ''}
+      ${t.translation ? `<p class="xlat">≈ ${t.translation}</p>` : ''}
+      ${t.def ? `<p class="def">${t.def}</p>` : ''}
+      ${deep}
+    </div>
+  </article>`;
+}
+
+// ── views ──
+function renderConcepts() {
+  const linked = allTerms.filter((t) => t.deep.length).length;
+  const house = allTerms.filter((t) => t.house).length;
+  main.innerHTML = `
+    <header class="view-head">
+      <p class="eyebrow">Knowledge</p>
+      <h1>Concepts</h1>
+      <p class="lede">The engineering vocabulary I work with, grouped by family, one line per term. Where I've written a fuller definition in my own words, open <em>Your notes</em> under the term.</p>
+      <p class="meta">${allTerms.length} terms · ${DATA.families.length} families · ${linked} with my notes · ${house} house terms</p>
+      <p class="legend"><span class="house">house</span> A term coined in my projects. Useful, but translate it (≈) when talking to other engineers.</p>
+    </header>
+    ${DATA.families.map((f) => `
+      <section class="family" id="${f.id}">
+        <header class="fam-head"><h2>${esc(f.name)}</h2><p>${esc(f.tagline)}</p><span class="count">${f.terms.length} terms</span></header>
+        ${f.terms.map((t) => termHTML(t)).join('')}
+      </section>`).join('')}`;
+}
+
+function renderTopic(t) {
+  const back = backlinks[t.id] ?? [];
+  main.innerHTML = `
+    <header class="view-head">
+      <p class="eyebrow">Your notes</p>
+      <h1>${esc(t.title)}</h1>
+      <p class="lede">${t.covers}</p>
+      ${back.length ? `<p class="backlinks">In the concepts map:${back.map((b) => `<a href="#${b.id}">${esc(b.name)}</a>`).join('')}</p>` : ''}
+    </header>
+    ${t.intro ? `<div class="prose">${t.intro}</div>` : ''}
+    ${t.sections.map((s) => `<section class="dd-section" id="${s.id}"><h2>${s.heading}</h2><div class="prose">${s.html}</div></section>`).join('')}`;
+}
+
+// ── search: every word must appear in a term's name/definition or a note section's text ──
+const sectionIndex = DATA.topics.flatMap((t) => [
+  ...(t.introText ? [{ anchor: t.id, topic: t, heading: '', text: t.introText }] : []),
+  ...t.sections.map((s) => ({ anchor: s.id, topic: t, heading: s.plain, text: s.text })),
+]);
+
+function highlight(str, words) {
+  const safe = esc(str);
+  if (!words.length) return safe;
+  return safe.replace(new RegExp(`(${words.map((w) => reEsc(esc(w))).join('|')})`, 'gi'), '<mark>$1</mark>');
+}
+function snippet(text, words) {
+  const lower = text.toLowerCase();
+  const at = Math.max(0, Math.min(...words.map((w) => lower.indexOf(w)).filter((i) => i >= 0)));
+  const start = Math.max(0, at - 60);
+  const cut = text.slice(start, at + 140);
+  return (start ? '…' : '') + highlight(cut, words) + (at + 140 < text.length ? '…' : '');
+}
+
+function renderSearch(query) {
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const has = (hay) => words.every((w) => hay.toLowerCase().includes(w));
+  const terms = allTerms
+    .filter((t) => has(`${t.name} ${t.text}`))
+    .map((t) => ({ t, rank: t.name.toLowerCase().startsWith(words[0]) ? 0 : has(t.name) ? 1 : 2 }))
+    .sort((a, b) => a.rank - b.rank)
+    .map(({ t }) => t);
+  const notes = sectionIndex.filter((s) => has(`${s.topic.title} ${s.heading} ${s.text}`));
+  const summary = [terms.length && `${terms.length} term${terms.length === 1 ? '' : 's'}`, notes.length && `${notes.length} note section${notes.length === 1 ? '' : 's'}`].filter(Boolean).join(' · ');
+  main.innerHTML = `
+    <header class="view-head">
+      <p class="eyebrow">Search</p>
+      <h1>${esc(query)}</h1>
+      <p class="lede">${summary || 'No matches.'}</p>
+    </header>
+    <div class="results">
+      ${!terms.length && !notes.length ? `<p class="empty">Search looks at term names, their one-line definitions and your notes. Try fewer words, or part of a word.</p>` : ''}
+      ${terms.length ? `<h2>Terms</h2>${terms.map((t) => termHTML(t, words)).join('')}` : ''}
+      ${notes.length ? `<h2>In your notes</h2>${notes.map((s) => `
+        <a class="hit" href="#${s.anchor}">
+          <span class="hit-where">${esc(s.topic.title)}${s.heading ? ` <span>› ${highlight(s.heading, words)}</span>` : ''}</span>
+          <span class="hit-snip">${snippet(s.text, words)}</span>
+        </a>`).join('')}` : ''}
+    </div>`;
+  view = 'search';
+  setCurrent(null);
+}
+
+// ── routing: the #hash picks the view; a family, term or section id scrolls within it ──
+let view = null;
+let first = true;
+function route() {
+  const hash = decodeURIComponent(location.hash.slice(1)) || 'concepts';
+  const topic = topicById[hash.split('--')[0]];
+  const next = topic ? topic.id : 'concepts';
+  if (next !== view) {
+    if (topic) renderTopic(topic); else renderConcepts();
+    view = next;
+  }
+  setCurrent(next, hash);
+  const target = hash === next ? null : document.getElementById(hash);
+  // after layout settles (and again once fonts load, which shifts it) so the target stays in view
+  const scroll = () => target ? target.scrollIntoView({ block: 'start' }) : window.scrollTo(0, 0);
+  requestAnimationFrame(scroll);
+  if (first) { first = false; document.fonts?.ready.then(() => requestAnimationFrame(scroll)); }
+  document.body.classList.remove('nav-open');
+  $('#menu').setAttribute('aria-expanded', 'false');
+}
+function setCurrent(v, hash) {
+  document.querySelectorAll('.nav a').forEach((a) => {
+    const on = (a.dataset.view && a.dataset.view === v) || (a.dataset.fam && a.dataset.fam === hash);
+    a.setAttribute('aria-current', on ? 'true' : 'false');
+  });
+}
+
+// ── events ──
+main.addEventListener('click', (e) => {
+  const toggle = e.target.closest('.deep-toggle');
+  if (toggle) {
+    const open = toggle.getAttribute('aria-expanded') !== 'true';
+    toggle.setAttribute('aria-expanded', String(open));
+    document.getElementById(toggle.getAttribute('aria-controls')).hidden = !open;
+  }
+});
+document.addEventListener('click', (e) => {   // following a link out of search clears it
+  const link = e.target.closest('a[href^="#"]');
+  if (!link || !q.value) return;
+  q.value = '';
+  view = null;
+  if (link.getAttribute('href') === location.hash) { e.preventDefault(); route(); }
+});
+q.addEventListener('input', () => {
+  if (q.value.trim()) renderSearch(q.value.trim());
+  else { view = null; route(); }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === '/' && document.activeElement !== q) { e.preventDefault(); q.focus(); }
+  if (e.key === 'Escape' && document.activeElement === q && q.value) { q.value = ''; view = null; route(); }
+});
+$('#menu').addEventListener('click', () => {
+  const open = document.body.classList.toggle('nav-open');
+  $('#menu').setAttribute('aria-expanded', String(open));
+});
+window.addEventListener('hashchange', route);
+route();
+</script>
