@@ -9,7 +9,7 @@ A running notebook of things I learn while building projects.
 | [`glossary/`](glossary/) | Technical terms I need to review, defined in my own words |
 | [`lessons-learned/`](lessons-learned/) | Takeaways from projects — what worked, what broke, what I'd change |
 | [`snippets/`](snippets/) | Reusable code bits and commands |
-| [`skills/`](skills/) | Reusable agent skills in Claude Code's native format (session-startup, plan-first, log-implementation, write-handoff, prompt-coaching) — copy into a new project's `.claude/skills/` |
+| [`skills/`](skills/) | Reusable agent skills in Claude Code's native format — see [`skills/README.md`](skills/README.md) for the full list. Copy into a new project's `.claude/skills/` |
 
 ## How I use this
 

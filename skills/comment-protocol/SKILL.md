@@ -1,3 +1,8 @@
+---
+name: comment-protocol
+description: Conventions for comments, markers and docs that a reader with no project memory can trust — decision fingerprints, KIND/flip-condition test headers, KEEP-IN-SYNC markers, dated claims. Use on day one of a new project, when adding comments or markers, or when auditing an existing codebase.
+---
+
 # comment-protocol — annotations a zero-context reader can trust
 
 **What this is:** the conventions that make a codebase **agent-legible** — comments, markers and
