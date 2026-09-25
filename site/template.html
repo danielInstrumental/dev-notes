@@ -37,6 +37,7 @@
   }
 
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   body {
     background: var(--bg); color: var(--ink);
     font: 400 15px/1.6 var(--sans);
@@ -72,10 +73,17 @@
     position: absolute; right: .6rem; top: 50%; translate: 0 -50%;
     font: 500 .72rem/1 var(--mono); color: var(--faint); border: 1px solid var(--line); border-radius: 4px; padding: .2rem .35rem;
   }
-  .nav { display: flex; flex-direction: column; gap: 1.25rem; }
-  .nav h2 {
-    margin: 0 0 .35rem; font: 600 .7rem/1 var(--sans); text-transform: uppercase; letter-spacing: .12em; color: var(--faint);
+  .nav { display: flex; flex-direction: column; gap: .15rem; }
+  .group-head {
+    display: flex; align-items: center; gap: .55rem; width: calc(100% + 1.1rem); margin-inline: -.55rem;
+    padding: .45rem .55rem; border: 0; border-radius: 5px; background: none; cursor: pointer;
+    font: 600 .92rem/1.3 var(--sans); color: var(--ink); text-align: left;
   }
+  .group-head:hover { background: var(--surface); }
+  .group-head .chev { color: var(--faint); }
+  .group-head[aria-expanded="true"] .chev { rotate: 45deg; translate: 0 -3px; }
+  .group-head .n { margin-left: auto; }
+  .nav .group-body { padding: .1rem 0 .6rem 1rem; }   /* .nav-scoped: .nav ul would otherwise zero it */
   .nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
   .nav a, .nav .soon {
     display: flex; justify-content: space-between; gap: .5rem;
@@ -85,9 +93,7 @@
   .nav a:hover { color: var(--ink); background: var(--surface); }
   .nav a[aria-current="true"] { color: var(--accent); background: var(--accent-soft); font-weight: 500; }
   .nav .n { font: 400 .75rem/1.9 var(--mono); color: var(--faint); font-variant-numeric: tabular-nums; }
-  .nav .sub a { padding-left: 1.3rem; font-size: .86rem; }
-  .nav .soon { color: var(--faint); }
-  .nav .soon span:last-child { font-size: .72rem; }
+  .nav .soon { color: var(--faint); cursor: default; }
   .built { margin-top: auto; font: 400 .72rem/1.5 var(--mono); color: var(--faint); }
 
   /* ── main column ── */
@@ -187,7 +193,7 @@
       border: 1px solid var(--line); border-radius: 6px; padding: .45rem .7rem; cursor: pointer;
     }
     .search kbd, .built { display: none; }
-    .nav { display: none; padding-bottom: .75rem; }
+    .nav { display: none; padding-bottom: .5rem; }
     .nav-open .nav { display: flex; }
     main { padding-block: 1.75rem 4rem; }
   }
@@ -233,24 +239,50 @@ const backlinks = {};   // topic id → map terms that point into it
 for (const t of allTerms) for (const d of t.deep) (backlinks[d.topic] ??= []).some((b) => b.id === t.id) || backlinks[d.topic].push(t);
 
 // ── sidebar ──
-$('#nav').innerHTML = `
-  <div>
-    <h2>Knowledge</h2>
-    <ul>
-      <li><a href="#concepts" data-view="concepts"><span>Concepts</span><span class="n">${allTerms.length}</span></a>
-        <ul class="sub">${DATA.families.map((f) => `<li><a href="#${f.id}" data-fam="${f.id}"><span>${esc(f.name)}</span><span class="n">${f.terms.length}</span></a></li>`).join('')}</ul></li>
-      <li class="soon"><span>Bug classes</span><span>not built yet</span></li>
-      <li class="soon"><span>Testing</span><span>not built yet</span></li>
-    </ul>
-  </div>
-  <div>
-    <h2>Your notes</h2>
-    <ul>${DATA.topics.map((t) => `<li><a href="#${t.id}" data-view="${t.id}"><span>${esc(t.title)}</span></a></li>`).join('')}</ul>
-  </div>
-  <div>
-    <h2>Later</h2>
-    <ul>${['Skills kit', 'Snippets', 'Lessons'].map((s) => `<li class="soon"><span>${s}</span><span>not built yet</span></li>`).join('')}</ul>
-  </div>`;
+const SOON = ['Bug classes', 'Testing', 'Skills kit', 'Snippets', 'Lessons'];
+const group = (id, label, count, items) => `
+  <section class="group" data-group="${id}">
+    <button class="group-head" type="button" aria-expanded="false" aria-controls="g-${id}">
+      <span class="chev" aria-hidden="true"></span>${label}<span class="n">${count}</span>
+    </button>
+    <ul class="group-body" id="g-${id}" hidden>${items}</ul>
+  </section>`;
+$('#nav').innerHTML =
+  group('concepts', 'Concepts', allTerms.length,
+    `<li><a href="#concepts" data-view="concepts"><span>All concepts</span></a></li>` +
+    DATA.families.map((f) => `<li><a href="#${f.id}" data-fam="${f.id}"><span>${esc(f.name)}</span><span class="n">${f.terms.length}</span></a></li>`).join('')) +
+  group('notes', 'Your notes', DATA.topics.length,
+    DATA.topics.map((t) => `<li><a href="#${t.id}" data-view="${t.id}"><span>${esc(t.title)}</span></a></li>`).join('')) +
+  group('later', 'Coming later', SOON.length,
+    SOON.map((name) => `<li class="soon"><span>${name}</span></li>`).join(''));
+
+// Accordion state: remembered in this browser (a convenience, so storage failing is fine).
+// The group you're in opens by itself; one you open or close by hand stays that way.
+const NAV_KEY = 'dev-notes:nav-groups';
+const navOpen = (() => { try { return JSON.parse(localStorage.getItem(NAV_KEY)) || {}; } catch { return {}; } })();
+const saveNav = () => { try { localStorage.setItem(NAV_KEY, JSON.stringify(navOpen)); } catch {} };
+function setGroup(id, open) {
+  navOpen[id] = open;
+  const head = document.querySelector(`[data-group="${id}"] .group-head`);
+  head.setAttribute('aria-expanded', String(open));
+  head.nextElementSibling.hidden = !open;
+}
+for (const id of ['concepts', 'notes', 'later']) setGroup(id, Boolean(navOpen[id]));
+let activeGroup = null;
+function openGroupFor(v) {
+  const id = v === 'concepts' ? 'concepts' : 'notes';
+  if (id === activeGroup) return;
+  if (activeGroup) setGroup(activeGroup, false);
+  setGroup(id, true);
+  activeGroup = id;
+  saveNav();
+}
+$('#nav').addEventListener('click', (e) => {
+  const head = e.target.closest('.group-head');
+  if (!head) return;
+  setGroup(head.parentElement.dataset.group, head.getAttribute('aria-expanded') !== 'true');
+  saveNav();
+});
 $('#built').innerHTML = `Built ${esc(DATA.built)} from ${esc(DATA.commit)}.<br>Edit the markdown in knowledge/, then rebuild.`;
 
 // ── one term row ──
@@ -367,6 +399,7 @@ function route() {
     view = next;
   }
   setCurrent(next, hash);
+  openGroupFor(next);
   const target = hash === next ? null : document.getElementById(hash);
   // after layout settles (and again once fonts load, which shifts it) so the target stays in view
   const scroll = () => target ? target.scrollIntoView({ block: 'start' }) : window.scrollTo(0, 0);
@@ -377,7 +410,7 @@ function route() {
 }
 function setCurrent(v, hash) {
   document.querySelectorAll('.nav a').forEach((a) => {
-    const on = (a.dataset.view && a.dataset.view === v) || (a.dataset.fam && a.dataset.fam === hash);
+    const on = (a.dataset.view === v && !(v === 'concepts' && hash?.startsWith('f-'))) || (a.dataset.fam !== undefined && a.dataset.fam === hash);
     a.setAttribute('aria-current', on ? 'true' : 'false');
   });
 }
