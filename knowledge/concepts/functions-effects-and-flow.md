@@ -6,8 +6,24 @@
 
 - **mechanism / flow** — how a feature actually works step by step
 - **data flow** — the path data takes through the system → [[#Data flow]]
+- **consumers / downstream** — consumers are the code that reads a value; downstream is anything
+  later in the flow that depends on it → [[#Consumers]]
+- **write path vs read path** — how data gets in and stored vs how it gets back out
+  → [[#Write path vs read path]]
+- **hop** — one step a value passes through (input → validation → save); informal but widely
+  understood → [[#Hop]]
+- **propagation** — a change flowing onward to everything downstream → [[#Propagation]]
+- **debounce** — wait until input settles, then fire once (vs **throttle**: fire at most once per
+  interval) → [[#Debounce]]
+- **event bus** — a shared channel: parts publish events, others subscribe, so they never call each
+  other directly (publish/subscribe) → [[#Event bus]]
 - **side effect** — extra state mutated beyond the obvious result
   → [[#Side effect]]
+- **pure function** — same input → always the same output, and no side effects → [[#Pure function]]
+- 🏠 **attribution rule** — a side effect belongs to the code that performs it, not to the pure
+  function that fed it → [[#Attribution rule]]
+- **functional core, imperative shell** — keep decisions pure; put side effects in a thin outer
+  layer → [[#Functional core]]
 - **idempotency** — running it twice is safe (converges, no duplicates)
   → [[#Idempotency]]
 
@@ -86,7 +102,7 @@ Delaying an action until input has "settled" — i.e. wait until N ms after the 
 
 ## Event bus / custom-event pattern
 
-Components that don't share state communicate by **dispatching and listening for events** rather than through a shared store. Useful when independently-loaded parts of a page can't see each other's state. Contrast with a centralized store (Redux-style) — with an event bus there is no single store; parts talk via events.
+Components communicate by **publishing** events to a shared channel and **subscribing** to the ones they care about — the **publish/subscribe** (pub/sub) pattern — so they never call each other directly. Useful when independently-loaded parts of a page can't see each other's state. Contrast with a centralized store (Redux-style) — with an event bus there is no single store; parts talk via events.
 
 ## Questions worth asking
 

@@ -8,9 +8,31 @@
 - **lifecycle** — the fixed sequence of stages something moves through (create → active → archived)
 - **eventual consistency** — a read may lag a write (search indexes, projections)
   → [[#Related distributed-systems terms]]
+- **read-after-write consistency** — after a write, a read is guaranteed to see it
+  → [[#Related distributed-systems terms]]
 - **source of truth (SSOT)** — the ONE place a fact authoritatively lives
   → [[#Source of truth]]
+- **derived state** — data computed from other data rather than entered (e.g. a progress %)
+  → [[#Derived state]]
+- **projection** — a copy of data reshaped and stored for a specific reader (e.g. a search index)
+  → [[#Projection]]
+- **cache** — a saved copy of computed or fetched data, kept to avoid redoing the work; can go stale
+  → [[#Cache]]
+- **stale** — a copy that no longer matches its source → [[#Stale]]
+- **DRY (Don't Repeat Yourself)** — every piece of knowledge (a rule, constant or shape) has ONE
+  authoritative definition → [[#DRY]]
 - **conceptual model / domain model** — the named concepts + relationships you think with
+- **scalar vs collection** — a field holds one value, or many (a list of values, or of whole
+  records) → [[#Field kinds]]
+- **cardinality** — how many records relate to how many: one-to-one, one-to-many, many-to-many (in
+  databases, also the number of distinct values in a column) → [[#Cardinality]]
+- **embedded vs normalized** — related data stored inside the parent record, or as separate linked
+  records → [[#How a one-to-many is stored]]
+- **discriminated union** — a value that can be one of several kinds, with a tag field saying which
+  (in a database: single-table inheritance) → [[#Related patterns]]
+- **upsert** — insert a record, or update it if it already exists → [[#Related patterns]]
+- **reconcile** — compare the desired state with the actual state, then change the actual to match
+  → [[#Related patterns]]
 
 ## State relationships
 
@@ -21,7 +43,7 @@ The vocabulary for *how two pieces of state relate*. A lot of hard bugs are mis-
 | **Source of truth** | The copy that *wins* when copies disagree; everything else should be recomputed from it. |
 | **Derived state** | Data **computed from** the source, not entered directly (e.g. a progress percentage, a "complete" flag). |
 | **Projection** | A derived **copy persisted elsewhere**, re-shaped for a different consumer. A projection doesn't follow its source backwards — wiping the source doesn't necessarily clear the projection. |
-| **Cache** | Derived state **stored to avoid recomputing**, which can go **stale**. |
+| **Cache** | A saved copy of **computed or fetched** data, kept to avoid redoing the work — which can go **stale**. |
 | **Stale** | A derived copy that no longer matches its source. |
 
 ## DRY / single source of truth
@@ -61,6 +83,9 @@ The vocabulary for *how two pieces of state relate*. A lot of hard bugs are mis-
 
 one-to-one · **one-to-many** · **nested one-to-many** (a parent's child has its own children) · many-to-many.
 
+(In databases, *cardinality* can also mean the number of **distinct values** in a column — a `status` column with
+three possible values has low cardinality. Context tells you which meaning is in play.)
+
 ## How a one-to-many is stored — two representations
 
 | Representation | Definition |
@@ -72,9 +97,9 @@ one-to-one · **one-to-many** · **nested one-to-many** (a parent's child has it
 
 ## Related patterns
 
-- **Discriminated union / single-table inheritance** — one table/object holding several kinds of record, told apart by a `type` **discriminator** column.
+- **Discriminated union** — a value that can be one of several kinds, with a tag field (the **discriminator**, e.g. `type`) saying which. Its database form is **single-table inheritance**: one table/object holding several kinds of record, told apart by a `type` column.
 - **Upsert** — "update if it exists, else insert." Made safe/repeatable with an **idempotency key** so a retry targets the same record instead of creating a duplicate (see [[functions-effects-and-flow#Idempotency]]).
-- **Reconcile** — bring a target into agreement with a source (create missing, update changed, remove/archive absent).
+- **Reconcile** — compare the **desired** state (the source) with the **actual** state (the target), then change the target to match: create missing, update changed, remove/archive absent.
 
 ## Relational vocabulary (so terms line up)
 

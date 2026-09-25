@@ -11,6 +11,8 @@
   → [[#Client validation vs server guard]]
 - **guard** — an enforced check that gates an action (the server-side one is authoritative)
   → [[#Guard]]
+- 🏠 **backstop** (≈ redundant server-side validation) — a second check that catches what bypasses
+  the first → [[#Backstop]]
 
 ## Invariant
 
@@ -23,6 +25,8 @@ A check that **gates** an action: it runs before the action and either lets it p
 ## Backstop
 
 A guard that **duplicates a check already done elsewhere** (usually the client) so that bypassing the first still gets caught.
+
+*House term* — the standard phrasing is **redundant server-side validation**, one instance of [[security#Defense-in-depth]].
 
 ## Client validation vs server guard — different *jobs*, not redundancy
 
