@@ -10,6 +10,7 @@ A running notebook of things I learn while building projects.
 | [`kit/`](kit/) | The agent skills kit in Claude Code's native format + templates — see [`kit/README.md`](kit/README.md); install into a project with `kit/install.sh` |
 | [`snippets/`](snippets/) | Reusable code bits and commands |
 | [`inbox/`](inbox/) | Things I'm still working out — recipes and gotchas from real builds, each with a status, until they graduate to a permanent home or get dropped |
+| [`.ai/`](.ai/) | Working on this repo itself — the session handoff log (where I left off) and the TODO (what's left) |
 | [`lessons/`](lessons/) | Takeaways from projects — what worked, what broke, what I'd change |
 
 ## How I use this
