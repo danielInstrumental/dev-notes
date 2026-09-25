@@ -21,6 +21,7 @@ given in parentheses).
 - **boundary** — where one part ends and another begins
 - **interface** — the visible set of operations a part exposes at its boundary
 - **contract** — the promises made across a boundary (shapes, semantics, guarantees)
+  → [[state-and-data#Implicit contract]]
 - **abstraction** — hiding detail behind a simpler concept
 - **dependency** — what a part needs from outside itself
 - **coupling** — how entangled two parts are (lower is better)
@@ -32,19 +33,26 @@ given in parentheses).
 - **mechanism / flow** — how a feature actually works step by step
 - **state** — the data a system remembers at a moment in time
 - **lifecycle** — the fixed sequence of stages something moves through (create → active → archived)
-- **data flow** — the path data takes through the system
+- **data flow** — the path data takes through the system → [[data-flow]]
 - **side effect** — extra state mutated beyond the obvious result
+  → [[functions-and-effects#Side effect]]
 - **idempotency** — running it twice is safe (converges, no duplicates)
+  → [[functions-and-effects#Idempotency]]
 - **race condition** — outcome depends on unpredictable ordering of concurrent events
 - **eventual consistency** — a read may lag a write (search indexes, projections)
+  → [[enforcement-and-safety#Related distributed-systems terms]]
 
 ## Correctness — what must stay true
 
 - **invariant** — a condition that must ALWAYS hold; break it and the system is wrong
+  → [[state-and-data#Invariant]]
 - **precondition / postcondition** — what must be true before / after an operation
 - **validation** — checking inputs against rules
+  → [[enforcement-and-safety#Client validation vs server guard]]
 - **guard** — an enforced check that gates an action (the server-side one is authoritative)
+  → [[enforcement-and-safety#Guard]]
 - **fail-open / fail-closed** — on error, allow or block? (both valid; unexamined is not)
+  → [[enforcement-and-safety#Fail-closed / fail-open]]
 - **fail-fast (fail-loud)** — on an unexpected condition, name it and STOP rather than paper over
   it with a fallback and continue
 - 🏠 **classify-don't-swallow** (≈ fail-fast on unexpected stored state: refuse the write instead
@@ -54,7 +62,7 @@ given in parentheses).
   survives when service degrades"; error handling chooses who pays for a failure — the data
   (silently, later) or the current request (visibly, now)
 - **defense in depth** — the same protection at multiple layers; the client copy is UX,
-  the server copy is the real line
+  the server copy is the real line → [[enforcement-and-safety#Defense-in-depth]]
 
 ## Security — who may do what, and what can be trusted
 
@@ -92,6 +100,7 @@ given in parentheses).
 - **regression** — something that used to work breaking again
 - **technical debt** — shortcuts that must be repaid later (acceptable when chosen consciously)
 - **drift** — duplicated things (rules, copies, docs) falling out of sync silently
+  → [[correctness-and-drift#Drift]]
 - **migration** — moving data/code from an old shape to a new one
 - **backward compatibility** — new code still handles old data/behavior
 - 🏠 **pin** (≈ regression test freezing a decision) · 🏠 **tripwire** (≈ canary test designed to
@@ -131,6 +140,7 @@ given in parentheses).
 - **convention** — an agreed rule/style (enforced by discipline, not by the machine)
 - **specification (spec)** — the written statement of what to build
 - **source of truth (SSOT)** — the ONE place a fact authoritatively lives
+  → [[state-and-data#Source of truth]]
 - **separation of concerns** — each part addresses one concern; don't tangle them
 - **ubiquitous language** — one precise shared vocabulary used identically in talk, docs, and code
 - **conceptual model / domain model** — the named concepts + relationships you think with

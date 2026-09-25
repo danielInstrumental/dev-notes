@@ -10,7 +10,7 @@ The vocabulary for *how two pieces of state relate*. A lot of hard bugs are mis-
 | **Cache** | Derived state **stored to avoid recomputing**, which can go **stale**. |
 | **Stale** | A derived copy that no longer matches its source. |
 | **Invariant** | A condition that must **always hold**, or something breaks (e.g. "these two validators always agree"). |
-| **Contract** | An **implicit agreement** between two pieces of code that neither one enforces — break one side and the other fails silently (e.g. an error key that doubles as a DOM id; rename the id and scroll-to-error breaks silently). |
+| **Implicit contract** | A **contract that nothing enforces** — an implicit agreement between two pieces of code; break one side and the other fails silently (e.g. an error key that doubles as a DOM id; rename the id and scroll-to-error breaks silently). |
 | **Consumers / downstream** | Everything that **reads** a value; "downstream" = after it in the data flow. |
 
 ## Recurring bug shapes (named)
