@@ -5,19 +5,20 @@
 ## Terms
 
 - **refactoring** — restructuring without changing behavior
-- **additive change** — new capability with existing paths untouched (vs a **behavioral fix**,
-  which changes what some path does — its risk scales with who can reach that path)
+- **additive change** — adds capability without changing existing behavior (vs a **behavioral fix**,
+  which changes what an existing path does — its risk scales with who can reach that path)
 - 🏠 **fail-path-only change** (≈ a fix confined to an error branch — healthy traffic never
   executes it, so working flows can't regress; the cheapest correctness class)
 - **hardening** — guards/validation added to make existing behavior safer, no new features
-- **cross-cutting change** — touches many sites or a shared convention; risk lives in COVERAGE
-  (vs a **surgical/localized** fix: one site, one rule)
+- **cross-cutting change** — one change spread across many places or a shared convention; the risk
+  is missing one (vs a **surgical/localized** fix: one site, one rule)
 - **blast radius** — how much can break if a change is wrong
 - **regression surface** — which existing behaviors need re-verification after a change; near a
   deadline you ration THIS, not lines of code
 - **reachability** — the estimator for both of the above: who/what can execute the changed code?
   A 10-line refactor of a shared helper can outweigh a 100-line additive feature
-- **technical debt** — shortcuts that must be repaid later (acceptable when chosen consciously)
+- **technical debt** — the future cost of a shortcut taken now; it grows until repaid (acceptable
+  when chosen consciously)
 - **drift** — duplicated things (rules, copies, docs) falling out of sync silently
   → [[#Drift]]
 - 🏠 **reference trace** (≈ impact analysis / "find all references") — find everything that uses a

@@ -5,9 +5,11 @@
 ## Terms
 
 - **state** — the data a system remembers at a moment in time
-- **lifecycle** — the fixed sequence of stages something moves through (create → active → archived)
-- **eventual consistency** — a read may lag a write (search indexes, projections)
-  → [[#Related distributed-systems terms]]
+- **lifecycle** — the stages one thing goes through over its existence: a record (draft → submitted
+  → archived) or a UI component (mount → update → unmount). Not the steps inside one action — that's
+  a flow. A lifecycle with strict rules about which stage can follow which is a **state machine**
+- **eventual consistency** — after a write, copies may briefly disagree (a search index, a
+  projection), but they converge if writes stop → [[#Related distributed-systems terms]]
 - **read-after-write consistency** — after a write, a read is guaranteed to see it
   → [[#Related distributed-systems terms]]
 - **source of truth (SSOT)** — the ONE place a fact authoritatively lives
@@ -21,7 +23,8 @@
 - **stale** — a copy that no longer matches its source → [[#Stale]]
 - **DRY (Don't Repeat Yourself)** — every piece of knowledge (a rule, constant or shape) has ONE
   authoritative definition → [[#DRY]]
-- **conceptual model / domain model** — the named concepts + relationships you think with
+- **conceptual model / domain model** — the concepts, rules and relationships of the business,
+  reflected in the code
 - **scalar vs collection** — a field holds one value, or many (a list of values, or of whole
   records) → [[#Field kinds]]
 - **cardinality** — how many records relate to how many: one-to-one, one-to-many, many-to-many (in

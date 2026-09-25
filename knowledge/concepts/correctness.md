@@ -9,7 +9,8 @@
 - **precondition / postcondition** — what must be true before / after an operation
 - **validation** — checking inputs against rules
   → [[#Client validation vs server guard]]
-- **guard** — an enforced check that gates an action (the server-side one is authoritative)
+- **guard** — a check that must pass before an action runs (the server-side one is authoritative).
+  Also: a **guard clause** is an early return at the top of a function for invalid input
   → [[#Guard]]
 - 🏠 **backstop** (≈ redundant server-side validation) — a second check that catches what bypasses
   the first → [[#Backstop]]

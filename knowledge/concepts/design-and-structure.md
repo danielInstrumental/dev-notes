@@ -4,17 +4,19 @@
 
 ## Terms
 
-- **module / component** — a self-contained piece with one job
-- **layer** — a horizontal stratum (UI / logic / persistence); each talks mainly to its neighbors
+- **module / component** — a self-contained unit that hides its internals behind an interface
+- **layer** — a horizontal level (UI / logic / storage); each layer depends only on the one below it
 - **boundary** — where one part ends and another begins
 - **interface** — the visible set of operations a part exposes at its boundary
 - **contract** — the promises made across a boundary (shapes, semantics, guarantees)
   → [[#Implicit contract]]
 - **abstraction** — hiding detail behind a simpler concept
 - **dependency** — what a part needs from outside itself
-- **coupling** — how entangled two parts are (lower is better)
+- **coupling** — how much one part depends on another's internals (lower is better: loose coupling
+  means you can change one without the other)
 - **cohesion** — how focused one part is on one job (higher is better)
-- **seam** — an injected point where behavior can be swapped (for tests, pivots)
+- **seam** — a place where you can change what code does without editing it there (e.g. an injected
+  dependency, a config switch) — for tests and pivots
 - **pattern** — a named reusable solution shape
 - **separation of concerns** — each part addresses one concern; don't tangle them
 

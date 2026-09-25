@@ -5,9 +5,9 @@
 ## Terms
 
 - **regression** — something that used to work breaking again
-- 🏠 **pin** (≈ regression test freezing a decision) · 🏠 **tripwire** (≈ canary test designed to
-  redden on a planned event) · 🏠 **drift guard / parity test** (≈ consistency check between
-  deliberate copies)
+- 🏠 **pin** (≈ characterization / regression test freezing a decided behavior) · 🏠 **tripwire** (≈
+  canary test designed to redden on a planned event) · 🏠 **drift guard / parity test** (≈
+  consistency check between deliberate copies)
 
 ## Conventional kinds (industry-standard vocabulary)
 

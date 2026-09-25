@@ -4,4 +4,5 @@
 
 ## Terms
 
-- 🏠 **standing instruction** (≈ a directive applying to every future turn)
+- 🏠 **standing instruction** (≈ a persistent instruction, like a system prompt or a CLAUDE.md rule,
+  that applies to every future turn)

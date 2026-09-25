@@ -11,15 +11,15 @@
 - **authorization (authz)** — whether that caller MAY do this (logged-in ≠ entitled)
 - **object-level authorization / ownership check** — authz per RECORD: does this id belong to
   this caller? Its absence is **IDOR/BOLA** — the change-the-id-in-the-URL bug class
-- **least privilege** — every credential carries only the scopes its job needs
+- **least privilege** — every user, process and credential gets only the access its job needs
 - **attack surface** — everything an attacker can reach or try (endpoints, params, uploads)
 - **validation vs sanitization** — reject bad input vs transform it to be safe (prefer reject +
   allowlists)
-- **OWASP Top 10 / STRIDE / CWE** — the canonical catalogs and taxonomy of vulnerability classes;
-  the professional shared vocabulary for this chapter (see the Security family in
-  `../bug-classes.md`)
-- **defense in depth** — the same protection at multiple layers; the client copy is UX,
-  the server copy is the real line → [[#Defense-in-depth]]
+- **OWASP Top 10 / STRIDE / CWE** — three standard references: **OWASP Top 10** = the most critical
+  web app risks; **STRIDE** = six threat categories for threat modeling; **CWE** = the numbered
+  catalog of weakness types (see the Security family in `../bug-classes.md`)
+- **defense in depth** — several independent layers of protection, so one failing doesn't breach the
+  whole (e.g. a client check for UX + a server check for integrity) → [[#Defense-in-depth]]
 
 ## Defense-in-depth
 

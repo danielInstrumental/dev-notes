@@ -8,12 +8,13 @@
   → [[#Fail-closed / fail-open]]
 - **fail-fast (fail-loud)** — on an unexpected condition, name it and STOP rather than paper over
   it with a fallback and continue
-- 🏠 **classify-don't-swallow** (≈ fail-fast on unexpected stored state: refuse the write instead
-  of substituting a default)
-- **fail-safe** — when in doubt, protect the stored data at the cost of availability
-- **availability vs durability** — the write-path trade: "operations always succeed" vs "data
-  survives when service degrades"; error handling chooses who pays for a failure — the data
-  (silently, later) or the current request (visibly, now)
+- 🏠 **classify-don't-swallow** (≈ don't swallow errors: fail fast on unexpected stored state —
+  refuse the write instead of substituting a default)
+- **fail-safe** — on failure, fall back to a state that causes no harm; for stored data, protect it
+  even if the request fails
+- **availability vs durability** — availability: the system keeps responding; durability: saved data
+  isn't lost. Error handling decides which one a failure costs — the data (silently, later) or the
+  current request (visibly, now). Related standard trade-off: **CAP** (consistency vs availability)
 
 ## Fail-closed / fail-open
 

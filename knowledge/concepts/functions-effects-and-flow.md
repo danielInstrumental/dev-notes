@@ -17,14 +17,15 @@
   interval) → [[#Debounce]]
 - **event bus** — a shared channel: parts publish events, others subscribe, so they never call each
   other directly (publish/subscribe) → [[#Event bus]]
-- **side effect** — extra state mutated beyond the obvious result
-  → [[#Side effect]]
+- **side effect** — any effect beyond returning a value: changing state outside the function, or
+  doing I/O (network, storage, logging) → [[#Side effect]]
 - **pure function** — same input → always the same output, and no side effects → [[#Pure function]]
 - 🏠 **attribution rule** — a side effect belongs to the code that performs it, not to the pure
   function that fed it → [[#Attribution rule]]
 - **functional core, imperative shell** — keep decisions pure; put side effects in a thin outer
   layer → [[#Functional core]]
-- **idempotency** — running it twice is safe (converges, no duplicates)
+- **idempotency** — doing it twice has the same effect as doing it once (safe to retry, no
+  duplicates). Not the same as an HTTP *safe* method, which has no side effects at all
   → [[#Idempotency]]
 
 ## Side effect
