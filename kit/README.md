@@ -6,8 +6,8 @@ folder containing a `SKILL.md` in **Claude Code's native skill format** — a YA
 project's `.claude/skills/` directory, where Claude Code auto-discovers them: the `description`
 tells the agent when to use each one, and you can invoke any of them directly by typing `/<name>`.
 
-Skills are **instructions only**. The reference material they draw on (concepts map, bug classes,
-testing ladder) lives in [`../knowledge/`](../knowledge/) and is installed alongside them at
+Skills are **instructions only**. The reference material they draw on (concept chapters, bug
+classes, the testing ladder) lives in [`../knowledge/`](../knowledge/) and is installed alongside them at
 `.claude/knowledge/`.
 
 They also read fine as plain markdown, so this repo doubles as the browsable reference copy.
@@ -44,12 +44,12 @@ SESSION END ───▶ current-state sweep + write the handoff               (
 | ↳ [`change-impact-checklist.md`](skills/plan-first/change-impact-checklist.md) | The dependency-impact checklist (§§1–8) the plan phases walk | Inside plan Phases 2 and 7 |
 | [`log-implementation/`](skills/log-implementation/SKILL.md) | One as-built entry per verified unit of change | After each user-verified change |
 | [`write-tests/`](skills/write-tests/SKILL.md) | Conventional testing practice (pyramid, AAA, test-with-the-change) + agentic pins/guards/tripwires | Writing any test; choosing what kind a change needs |
-| ↳ [`knowledge/testing.md`](../knowledge/testing.md) | All test kinds + the growth ladder (coverage → property-based → mutation → integration → E2E → CI) | Reference, on demand |
+| ↳ [`knowledge/concepts/testing.md`](../knowledge/concepts/testing.md) | All test kinds + the growth ladder (coverage → property-based → mutation → integration → E2E → CI) | Reference, on demand |
 | [`write-commits/`](skills/write-commits/SKILL.md) | Commit message conventions — Conventional Commits types + the seven timeless rules | Every commit / commit recommendation |
 | [`write-handoff/`](skills/write-handoff/SKILL.md) | The 13-section session handoff + the pre-handoff staleness sweep | Once, at session end |
 | [`comment-protocol/`](skills/comment-protocol/SKILL.md) | The agent-legible annotation system: decision fingerprints, KIND/flip-condition headers, KEEP-IN-SYNC markers, dated claims, negative documentation, the stranger test | Day one of a new project; auditing an existing one |
 | [`prompt-coaching/`](skills/prompt-coaching/SKILL.md) | Standing instruction: coach the user's prompts every turn | Every turn, every session (standing rule) |
-| ↳ [`knowledge/concepts/`](../knowledge/concepts/README.md) | Living map of engineering concept families (conventional vs house-style) — grows with every project | Reference the coaching draws from |
+| ↳ [`knowledge/concepts/`](../knowledge/concepts/README.md) | The concepts book: engineering vocabulary in 16 chapters (conventional vs house-style) — grows with every project | Reference the coaching draws from |
 | ↳ [`knowledge/bug-classes.md`](../knowledge/bug-classes.md) | Living map of bug classes — symptom → class name → standard mitigations | Named aloud whenever a session hits a bug |
 
 Not skills, but part of the kit:
@@ -122,7 +122,7 @@ its trigger:
   to plan before coding.
 
 (Within a skill, depth scales the same way — see `plan-first`'s "Scaling: light vs heavy plans"
-and the growth ladder in [`knowledge/testing.md`](../knowledge/testing.md): every phase runs, only the depth varies.)
+and the growth ladder in [`knowledge/concepts/testing.md`](../knowledge/concepts/testing.md): every phase runs, only the depth varies.)
 
 ## How the kit evolves (upstream first)
 

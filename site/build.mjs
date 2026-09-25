@@ -7,9 +7,13 @@
 // design and behavior. So: content changes happen in markdown, look-and-feel changes in the
 // template, and this file is just the bridge between them.
 //
-// It fails loudly: a line it can't parse, a file missing from the index, or a [[link]] that points
-// nowhere stops the build with a message. A broken note should block the page, not silently vanish
-// from it.
+// The page mirrors the files: knowledge/concepts/README.md is the table of contents (parts →
+// chapters), and each chapter file is one page — its Covers line, its Terms list, then its
+// own-words explanations (the ## sections below the Terms).
+//
+// It fails loudly: a chapter missing from the contents, a line it can't parse, or a [[link]] that
+// points nowhere stops the build with a message. A broken note should block the page, not silently
+// vanish from it.
 import { readFileSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -26,72 +30,73 @@ const plain = (html) => html.replace(/<[^>]+>/g, '')
   .replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
 const fail = (msg) => { throw new Error(msg); };
 
-// ── 1. The deep-dive index: which topic files exist, in the order the concepts map lists them ──
+// ── 1. The table of contents: parts → chapters, in book order ──
 
-const map = read(CONCEPTS + 'README.md');
-const index = [...map.matchAll(/^\| \[([a-z0-9-]+)\.md\]\([^)]+\) \| (.+) \|$/gm)]
-  .map(([, id, covers]) => ({ id, covers }));
+const parts = [];
+const toc = [];   // chapters in order: { id, title, num, part }
+for (const line of read(CONCEPTS + 'README.md').split('\n')) {
+  const part = line.match(/^### Part ([IVX]+) — (.+)$/);
+  if (part) { parts.push({ num: part[1], name: part[2], chapters: [] }); continue; }
+  const ch = line.match(/^(\d+)\. \[(.+?)\]\(([a-z0-9-]+)\.md\)$/);
+  if (ch) {
+    const part = parts.at(-1) ?? fail(`contents: chapter "${ch[2]}" comes before any "### Part" heading`);
+    toc.push({ id: ch[3], title: ch[2], num: Number(ch[1]), part: part.num });
+    part.chapters.push(ch[3]);
+  }
+}
 const onDisk = readdirSync(new URL(CONCEPTS, ROOT)).filter((f) => f.endsWith('.md') && f !== 'README.md');
 for (const f of onDisk) {
-  if (!index.some((t) => t.id + '.md' === f)) fail(`${CONCEPTS}${f} isn't listed in the Deep dives table of ${CONCEPTS}README.md`);
+  if (!toc.some((c) => c.id + '.md' === f)) fail(`${CONCEPTS}${f} isn't listed in the Contents of ${CONCEPTS}README.md`);
 }
-const titles = Object.fromEntries(index.map(({ id }) => [id, read(`${CONCEPTS}${id}.md`).match(/^# (.+)$/m)[1]]));
+toc.forEach((c, i) => c.num === i + 1 || fail(`contents: "${c.title}" is numbered ${c.num}, expected ${i + 1}`));
 
-// ── 2. Each deep dive → an intro plus its ## sections (and term rows from "Term | Definition" tables) ──
+// ── 2. Split each chapter file: title · Covers line · Terms list · explanations ──
 
-// [[file]] and [[file#Heading]] between notes become in-page links
-const wikiLinks = (md) => md.replace(/\[\[([a-z0-9-]+)(?:#[^\]]+)?\]\]/g, (_, id) =>
-  titles[id] ? `[${titles[id]}](#${id})` : fail(`[[${id}]] points at a file that doesn't exist`));
+const raw = Object.fromEntries(toc.map(({ id }) => {
+  const where = `${CONCEPTS}${id}.md`;
+  const md = read(where);
+  const terms = md.indexOf('\n## Terms\n');
+  if (terms < 0) fail(`${where} has no "## Terms" section`);
+  const next = md.indexOf('\n## ', terms + 1);
+  return [id, {
+    title: (md.match(/^# (.+)$/m) ?? fail(`${where} has no # title`))[1],
+    covers: (md.match(/^> \*\*Covers:\*\* (.+)$/m) ?? fail(`${where} has no "> **Covers:**" line`))[1],
+    terms: md.slice(terms + 10, next < 0 ? undefined : next),
+    rest: next < 0 ? '' : md.slice(next + 1),
+  }];
+}));
 
-function parseTopic({ id, covers }) {
-  const tokens = marked.lexer(wikiLinks(read(`${CONCEPTS}${id}.md`)));
-  const topic = { id, title: titles[id], covers: marked.parseInline(covers), intro: '', sections: [], rows: [] };
-  let section = null;
-  let buffer = [];
-  const flush = () => {
-    const html = marked.parser(Object.assign(buffer, { links: tokens.links }));
-    if (section) section.html = html; else topic.intro = html;
-    buffer = [];
-  };
-  for (const t of tokens) {
-    if (t.type === 'heading' && t.depth === 1) continue;
+// Index every heading (and every row of a "Term | Definition" table) so [[links]] can resolve
+const targets = {};   // chapter id → [{ plain, anchor, row? }]
+for (const [id, { rest }] of Object.entries(raw)) {
+  targets[id] = [];
+  let section = id;
+  for (const t of marked.lexer(rest)) {
     if (t.type === 'heading' && t.depth === 2) {
-      flush();
-      section = { id: `${id}--${slug(norm(t.text))}`, heading: marked.parseInline(t.text), plain: plain(marked.parseInline(t.text)) };
-      topic.sections.push(section);
-      continue;
+      section = `${id}--${slug(norm(t.text))}`;
+      targets[id].push({ plain: plain(marked.parseInline(t.text)), anchor: section });
     }
     if (t.type === 'table' && norm(t.header[0].text) === 'term') {
-      for (const row of t.rows) {
-        topic.rows.push({ term: plain(marked.parseInline(row[0].text)), html: marked.parseInline(row[1].text), anchor: section ? section.id : id });
-      }
+      for (const row of t.rows) targets[id].push({ plain: plain(marked.parseInline(row[0].text)), anchor: section, row: true });
     }
-    buffer.push(t);
   }
-  flush();
-  topic.introText = plain(topic.intro);
-  for (const s of topic.sections) s.text = plain(s.html);
-  return topic;
 }
 
-const topics = index.map(parseTopic);
-
-// A map term's "→ [[file#Heading]]" pointer resolves to a section heading, or a term in a table
-function resolve(ref) {
+// "[[chapter#Heading]]", "[[#Heading]]" (same chapter) or "[[chapter]]" → { chapter, anchor, label }
+function resolve(ref, from) {
   const [id, heading] = ref.split('#');
-  const topic = topics.find((t) => t.id === id) ?? fail(`→ [[${ref}]]: no deep dive called ${id}.md`);
-  if (!heading) return { topic: id, anchor: id, label: topic.title, html: topic.intro };
+  const chapter = id || from;
+  if (!raw[chapter]) fail(`[[${ref}]] in ${from}.md: no chapter called ${chapter}.md`);
+  if (!heading) return { chapter, anchor: chapter, label: raw[chapter].title };
   const want = norm(heading);
-  const section = topic.sections.find((s) => norm(s.plain).startsWith(want));
-  if (section) return { topic: id, anchor: section.id, label: section.plain, html: section.html };
-  const row = topic.rows.find((r) => norm(r.term).startsWith(want));
-  if (row) return { topic: id, anchor: row.anchor, label: row.term, html: `<p>${row.html}</p>` };
-  fail(`→ [[${ref}]] doesn't match a heading or a term in ${id}.md`);
+  const hit = targets[chapter].find((t) => !t.row && norm(t.plain).startsWith(want))
+    ?? targets[chapter].find((t) => t.row && norm(t.plain).startsWith(want))
+    ?? fail(`[[${ref}]] in ${from}.md doesn't match a heading or a table term in ${chapter}.md`);
+  return { chapter, anchor: hit.anchor, label: (chapter === from ? '' : `${raw[chapter].title} › `) + hit.plain };
 }
 
-// ── 3. The concepts map → families of one-line terms ──
+// ── 3. Terms: "- **name** — definition" lines; house terms "🏠 **name** (≈ translation)" ──
 
-// "🏠 **pin** (≈ regression test…)" → the translation inside the outer (≈ …), plus whatever follows it
 function splitTranslation(rest) {
   let depth = 0;
   for (let i = 0; i < rest.length; i++) {
@@ -102,12 +107,12 @@ function splitTranslation(rest) {
 }
 
 const seen = new Set();
-function parseBullet(line) {
+function parseBullet(line, chapter) {
   const pointers = [...line.matchAll(/→ \[\[([^\]]+)\]\]/g)].map((m) => m[1]);
   const body = line.replace(/\s*→ \[\[[^\]]+\]\]/g, '').trim();
-  // one bullet can hold several house terms: "🏠 **pin** (≈ …) · 🏠 **tripwire** (≈ …)"
+  // one line can hold several house terms: "🏠 **pin** (≈ …) · 🏠 **tripwire** (≈ …)"
   return body.split(/ · (?=🏠 )/).map((part, n) => {
-    const m = part.match(/^(🏠 )?\*\*(.+?)\*\*\s*(.*)$/) ?? fail(`can't parse this concepts-map line: ${part}`);
+    const m = part.match(/^(🏠 )?\*\*(.+?)\*\*\s*(.*)$/) ?? fail(`${chapter}.md: can't parse this term line: ${part}`);
     const [, house, name] = m;
     let rest = m[3];
     let translation = '';
@@ -120,32 +125,59 @@ function parseBullet(line) {
       id, name, house: Boolean(house),
       translation: translation && marked.parseInline(translation),
       def: rest && marked.parseInline(rest),
-      deep: n === 0 ? pointers.map(resolve) : [],
+      deep: n === 0 ? pointers.map((p) => resolve(p, chapter)) : [],
     };
     term.text = plain(`${term.translation} ${term.def}`);
     return term;
   });
 }
 
-const families = [];
-let family = null;
-const lines = map.split('\n');
-for (let i = 0; i < lines.length; i++) {
-  const line = lines[i];
-  if (line.startsWith('## ')) {
-    const [name, tagline = ''] = line.slice(3).split(' — ');
-    const isFamily = !/^(Deep dives|How this file grows)/.test(name);
-    family = isFamily ? { id: 'f-' + slug(name), name, tagline, terms: [] } : null;
-    if (family) families.push(family);
-    continue;
+function parseTerms(block, chapter) {
+  const terms = [];
+  const lines = block.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    if (!lines[i].startsWith('- ')) continue;
+    let bullet = lines[i].slice(2);
+    while (i + 1 < lines.length && /^\s+\S/.test(lines[i + 1])) bullet += ' ' + lines[++i].trim();
+    terms.push(...parseBullet(bullet, chapter));
   }
-  if (!family || !line.startsWith('- ')) continue;
-  let bullet = line.slice(2);
-  while (i + 1 < lines.length && /^\s+\S/.test(lines[i + 1])) bullet += ' ' + lines[++i].trim();
-  family.terms.push(...parseBullet(bullet));
+  return terms;
 }
 
-// ── 4. Fill the template ──
+// ── 4. Explanations: the ## sections below the Terms ──
+
+function parseSections(md, chapter) {
+  const linked = md.replace(/\[\[([^\]]+)\]\]/g, (_, ref) => {
+    const r = resolve(ref, chapter);
+    return `[${r.label}](#${r.anchor})`;
+  });
+  const tokens = marked.lexer(linked);
+  const sections = [];
+  let buffer = [];
+  const flush = () => {
+    if (sections.length) sections.at(-1).html = marked.parser(Object.assign(buffer, { links: tokens.links }));
+    buffer = [];
+  };
+  for (const t of tokens) {
+    if (t.type === 'heading' && t.depth === 2) {
+      flush();
+      const heading = marked.parseInline(t.text);
+      sections.push({ id: `${chapter}--${slug(norm(t.text))}`, heading, plain: plain(heading), html: '' });
+    } else buffer.push(t);
+  }
+  flush();
+  for (const s of sections) s.text = plain(s.html);
+  return sections;
+}
+
+const chapters = toc.map((c) => ({
+  ...c,
+  covers: marked.parseInline(raw[c.id].covers),
+  terms: parseTerms(raw[c.id].terms, c.id),
+  sections: parseSections(raw[c.id].rest, c.id),
+}));
+
+// ── 5. Fill the template ──
 
 const repo = fileURLToPath(ROOT);
 const git = (cmd) => { try { return execSync(`git ${cmd}`, { cwd: repo }).toString().trim(); } catch { return ''; } };
@@ -153,8 +185,8 @@ const edited = git('status --porcelain -- knowledge') !== '';
 const data = {
   built: new Date().toISOString().slice(0, 10),
   commit: (git('rev-parse --short HEAD') || 'unknown') + (edited ? ' + local edits' : ''),
-  families,
-  topics: topics.map(({ rows, ...t }) => t),
+  parts,
+  chapters,
 };
 const json = JSON.stringify(data).replace(/</g, '\\u003c');   // can't close the <script> early
 const SLOT = 'const DATA = __DATA__;';
@@ -165,6 +197,8 @@ const page = template.replace(SLOT, () => `const DATA = ${json};`);
 mkdirSync(new URL('site/dist/', ROOT), { recursive: true });
 writeFileSync(new URL('site/dist/dev-notes.html', ROOT), page);
 
-const terms = families.flatMap((f) => f.terms);
-console.log(`built site/dist/dev-notes.html — ${terms.length} terms in ${families.length} families, ` +
-  `${topics.length} deep dives, ${terms.filter((t) => t.deep.length).length} terms linked to your notes`);
+const terms = chapters.flatMap((c) => c.terms);
+const empty = chapters.filter((c) => !c.terms.length).length;
+console.log(`built site/dist/dev-notes.html — ${terms.length} terms in ${chapters.length} chapters ` +
+  `(${empty} empty) across ${parts.length} parts, ${chapters.reduce((n, c) => n + c.sections.length, 0)} explanations, ` +
+  `${terms.filter((t) => t.deep.length).length} terms linked to one`);

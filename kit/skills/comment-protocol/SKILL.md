@@ -62,5 +62,5 @@ is the part with no standard name yet; "agent-legible" is the emerging term.
 ## Cross-links (in this kit)
 
 `write-tests` (the test taxonomy the KIND header points into) · `plan-first` (the KEEP-IN-SYNC +
-registry duty) · `write-handoff` (DO-NOT lists, mental-model pins) · the concepts map (`.claude/knowledge/concepts/README.md`: ADR,
+registry duty) · `write-handoff` (DO-NOT lists, mental-model pins) · the concepts chapters (`.claude/knowledge/concepts/documentation-and-knowledge.md`: ADR,
 stranger test) · the kit's `templates/` (the register headings' token convention).

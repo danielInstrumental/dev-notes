@@ -46,6 +46,7 @@
   a { color: var(--accent); text-underline-offset: 2px; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
   mark { background: var(--mark); color: inherit; border-radius: 2px; padding-inline: 1px; }
+  .chev { width: .45rem; height: .45rem; border: solid currentColor; border-width: 0 1.5px 1.5px 0; rotate: -45deg; translate: 0 -1px; transition: rotate .15s; flex: none; }
 
   /* ── shell: sidebar + main ── */
   .shell {
@@ -73,45 +74,71 @@
     position: absolute; right: .6rem; top: 50%; translate: 0 -50%;
     font: 500 .72rem/1 var(--mono); color: var(--faint); border: 1px solid var(--line); border-radius: 4px; padding: .2rem .35rem;
   }
-  .nav { display: flex; flex-direction: column; gap: .15rem; }
-  .group-head {
-    display: flex; align-items: center; gap: .55rem; width: calc(100% + 1.1rem); margin-inline: -.55rem;
-    padding: .45rem .55rem; border: 0; border-radius: 5px; background: none; cursor: pointer;
-    font: 600 .92rem/1.3 var(--sans); color: var(--ink); text-align: left;
-  }
-  .group-head:hover { background: var(--surface); }
-  .group-head .chev { color: var(--faint); }
-  .group-head[aria-expanded="true"] .chev { rotate: 45deg; translate: 0 -3px; }
-  .group-head .n { margin-left: auto; }
-  .nav .group-body { padding: .1rem 0 .6rem 1rem; }   /* .nav-scoped: .nav ul would otherwise zero it */
+
+  .nav { display: flex; flex-direction: column; gap: .1rem; }
   .nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
   .nav a, .nav .soon {
     display: flex; justify-content: space-between; gap: .5rem;
     padding: .28rem .55rem; margin-inline: -.55rem; border-radius: 5px;
-    color: var(--muted); text-decoration: none; font-size: .9rem;
+    color: var(--muted); text-decoration: none; font-size: .88rem;
   }
   .nav a:hover { color: var(--ink); background: var(--surface); }
   .nav a[aria-current="true"] { color: var(--accent); background: var(--accent-soft); font-weight: 500; }
   .nav .n { font: 400 .75rem/1.9 var(--mono); color: var(--faint); font-variant-numeric: tabular-nums; }
+  .nav .ch { display: flex; gap: .5rem; min-width: 0; }
+  .nav .ch-num { font: 400 .75rem/1.9 var(--mono); color: var(--faint); min-width: 1.1rem; font-variant-numeric: tabular-nums; }
+  .nav a.is-empty .ch-title { color: var(--faint); }
   .nav .soon { color: var(--faint); cursor: default; }
+  .nav .contents { font-weight: 600; color: var(--ink); font-size: .92rem; margin-bottom: .35rem; }
+  .nav-label {
+    margin: .9rem 0 .3rem; font: 600 .68rem/1 var(--sans); text-transform: uppercase; letter-spacing: .12em; color: var(--faint);
+  }
+  .group-head {
+    display: flex; align-items: center; gap: .55rem; width: calc(100% + 1.1rem); margin-inline: -.55rem;
+    padding: .42rem .55rem; border: 0; border-radius: 5px; background: none; cursor: pointer;
+    font: 600 .9rem/1.3 var(--sans); color: var(--ink); text-align: left;
+  }
+  .group-head:hover { background: var(--surface); }
+  .group-head .chev { color: var(--faint); }
+  .group-head[aria-expanded="true"] .chev { rotate: 45deg; translate: 0 -3px; }
+  .group-head .part-num { font: 500 .72rem/1 var(--mono); color: var(--faint); min-width: 1.4rem; }
+  .group-head .n { margin-left: auto; }
+  .nav .group-body { padding: .1rem 0 .6rem 1rem; }   /* .nav-scoped: .nav ul would otherwise zero it */
   .built { margin-top: auto; font: 400 .72rem/1.5 var(--mono); color: var(--faint); }
 
   /* ── main column ── */
   main { padding-block: 2.5rem 6rem; max-width: 50rem; min-width: 0; }
-  .view-head { margin-bottom: 2.25rem; }
+  .view-head { margin-bottom: 2rem; }
   .eyebrow { margin: 0 0 .5rem; font: 600 .72rem/1 var(--sans); text-transform: uppercase; letter-spacing: .12em; color: var(--accent); }
   h1 { margin: 0 0 .75rem; font: 700 clamp(2rem, 4.5vw, 2.7rem)/1.05 var(--display); letter-spacing: -.025em; text-wrap: balance; }
   .lede { margin: 0; max-width: 62ch; color: var(--muted); font-size: 1.02rem; }
   .meta { margin: .9rem 0 0; font: 400 .8rem/1.5 var(--mono); color: var(--faint); font-variant-numeric: tabular-nums; }
   .legend { margin: 1rem 0 0; display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; color: var(--muted); font-size: .88rem; }
+  .block-head {
+    display: flex; align-items: baseline; gap: .75rem; margin: 2.75rem -.6rem 0; padding: 0 .6rem .55rem;
+    border-bottom: 2px solid var(--ink);
+  }
+  .block-head h2 { margin: 0; font: 700 1.35rem/1.2 var(--display); letter-spacing: -.015em; }
+  .block-head .count { margin-left: auto; font: 400 .78rem/1 var(--mono); color: var(--faint); }
 
-  /* ── concepts: families of terms ── */
-  .family { margin-top: 3rem; scroll-margin-top: 1.5rem; }
-  .fam-head { display: flex; align-items: baseline; gap: .75rem; flex-wrap: wrap; padding: 0 .6rem .6rem; margin-inline: -.6rem; border-bottom: 2px solid var(--ink); }
-  .fam-head h2 { margin: 0; font: 700 1.45rem/1.2 var(--display); letter-spacing: -.015em; }
-  .fam-head p { margin: 0; color: var(--muted); font-style: italic; }
-  .fam-head .count { margin-left: auto; font: 400 .78rem/1 var(--mono); color: var(--faint); }
+  /* ── contents: parts → chapters ── */
+  .toc-row {
+    display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; gap: .1rem 1rem; align-items: baseline;
+    padding: .85rem .6rem; margin-inline: -.6rem; border-bottom: 1px solid var(--line);
+    text-decoration: none; color: var(--ink); border-radius: 4px;
+  }
+  .toc-row:hover { background: var(--surface); }
+  .toc-num { font: 500 .85rem/1.5 var(--mono); color: var(--faint); font-variant-numeric: tabular-nums; }
+  .toc-title { font: 700 1.05rem/1.35 var(--display); }
+  .toc-covers { grid-column: 2; color: var(--muted); font-size: .9rem; }
+  .toc-count { grid-row: 1; grid-column: 3; font: 400 .78rem/1.5 var(--mono); color: var(--faint); white-space: nowrap; }
+  .toc-row.is-empty .toc-title { color: var(--muted); }
+  .empty-tag {
+    font: 600 .62rem/1 var(--sans); text-transform: uppercase; letter-spacing: .08em; color: var(--faint);
+    border: 1px dashed var(--line); border-radius: 3px; padding: .25rem .35rem .2rem;
+  }
 
+  /* ── terms ── */
   .term {
     display: grid; grid-template-columns: 12.5rem minmax(0, 1fr); gap: .2rem 1.5rem;
     padding: .85rem .6rem; margin-inline: -.6rem; border-bottom: 1px solid var(--line);
@@ -127,35 +154,25 @@
   .term-body > p { margin: 0; }
   .xlat { color: var(--house); }
   .xlat + .def { margin-top: .2rem; }
-  .fam-label { font: 400 .75rem/1.5 var(--sans); color: var(--faint); }
+  .where-label { display: block; font: 400 .75rem/1.5 var(--sans); color: var(--faint); }
   .house {
     font: 600 .62rem/1 var(--sans); text-transform: uppercase; letter-spacing: .08em;
     color: var(--house); background: var(--house-soft); border-radius: 3px; padding: .25rem .35rem .2rem;
     translate: 0 -1px;
   }
-  .deep-toggle {
-    margin-top: .45rem; display: inline-flex; align-items: baseline; gap: .4rem; flex-wrap: wrap;
-    font: 500 .84rem/1.4 var(--sans); color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; text-align: left;
+  .deep-link {
+    margin-top: .4rem; display: inline-flex; align-items: baseline; gap: .4rem; flex-wrap: wrap;
+    font: 500 .84rem/1.4 var(--sans); text-decoration: none;
   }
-  .deep-toggle .where { color: var(--faint); font-weight: 400; }
-  .chev { width: .45rem; height: .45rem; border: solid currentColor; border-width: 0 1.5px 1.5px 0; rotate: -45deg; translate: 0 -1px; transition: rotate .15s; flex: none; }
-  .deep-toggle[aria-expanded="true"] .chev { rotate: 45deg; translate: 0 -3px; }
-  .deep {
-    margin-top: .6rem; padding: .9rem 1.1rem; background: var(--surface);
-    border: 1px solid var(--line); border-radius: 7px; font-size: .93rem;
-  }
-  .deep .open { display: inline-block; margin-top: .75rem; font-size: .84rem; font-weight: 500; }
+  .deep-link:hover .deep-word { text-decoration: underline; }
+  .deep-link .where { color: var(--faint); font-weight: 400; }
+  .deep-link + .deep-link { margin-left: 1rem; }
+  .empty-note { margin: 1.1rem 0 0; color: var(--muted); max-width: 62ch; }
 
-  /* ── deep-dive topic page + rendered markdown ── */
-  .backlinks { margin: 1.1rem 0 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: .4rem; font-size: .86rem; color: var(--faint); }
-  .backlinks a {
-    font: 500 .8rem/1 var(--mono); text-decoration: none; color: var(--ink);
-    background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: .3rem .45rem;
-  }
-  .backlinks a:hover { border-color: var(--accent); color: var(--accent); }
-  .dd-section { margin-top: 2.5rem; scroll-margin-top: 1.5rem; }
-  .dd-section:target h2 { color: var(--accent); }
-  .dd-section h2 { margin: 0 0 .6rem; font: 700 1.35rem/1.25 var(--display); letter-spacing: -.01em; text-wrap: balance; }
+  /* ── explanations (rendered markdown) ── */
+  .dd-section { margin-top: 2.25rem; scroll-margin-top: 1.5rem; }
+  .dd-section h3 { margin: 0 0 .6rem; font: 700 1.2rem/1.25 var(--display); letter-spacing: -.01em; text-wrap: balance; }
+  .dd-section:target h3 { color: var(--accent); }
   .prose { max-width: 68ch; }
   .prose > :first-child { margin-top: 0; }
   .prose > :last-child { margin-bottom: 0; }
@@ -173,11 +190,19 @@
   .prose table { display: block; overflow-x: auto; border-collapse: collapse; font-size: .9rem; margin-block: 1rem; max-width: 100%; }
   .prose th, .prose td { text-align: left; vertical-align: top; padding: .5rem .8rem .5rem 0; border-bottom: 1px solid var(--line); }
   .prose th { font-weight: 600; font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: var(--faint); }
-  .prose td:first-child { white-space: nowrap; }
-  .deep .prose td:first-child, .deep td:first-child { white-space: normal; }
+
+  /* ── page turn ── */
+  .page-turn { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 4rem; }
+  .page-turn a {
+    display: flex; flex-direction: column; gap: .15rem; padding: .85rem 1rem; text-decoration: none;
+    border: 1px solid var(--line); border-radius: 7px; color: var(--ink); background: var(--surface);
+  }
+  .page-turn a:hover { border-color: var(--accent); }
+  .page-turn .dir { font: 500 .72rem/1.2 var(--sans); text-transform: uppercase; letter-spacing: .1em; color: var(--faint); }
+  .page-turn .next { grid-column: 2; text-align: right; }
 
   /* ── search results ── */
-  .results h2 { margin: 2.5rem 0 .4rem; font: 600 .72rem/1 var(--sans); text-transform: uppercase; letter-spacing: .12em; color: var(--faint); }
+  .results .block-head h2 { font-size: 1.1rem; }
   .hit { display: block; padding: .8rem .6rem; margin-inline: -.6rem; border-bottom: 1px solid var(--line); text-decoration: none; color: var(--ink); border-radius: 4px; }
   .hit:hover { background: var(--surface); }
   .hit-where { display: block; font-weight: 600; color: var(--accent); font-size: .92rem; }
@@ -199,7 +224,10 @@
   }
   @media (max-width: 560px) {
     .term { grid-template-columns: minmax(0, 1fr); }
-    .fam-head .count { margin-left: 0; }
+    .toc-row { grid-template-columns: 1.6rem minmax(0, 1fr); }
+    .toc-count { grid-row: auto; grid-column: 2; }
+    .page-turn { grid-template-columns: minmax(0, 1fr); }
+    .page-turn .next { grid-column: 1; }
   }
   @media (prefers-reduced-motion: reduce) {
     .term:target { animation: none; background: var(--accent-soft); }
@@ -215,7 +243,7 @@
     </div>
     <label class="search">
       <svg viewBox="0 0 16 16" fill="none" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="m11 11 3.5 3.5" stroke-linecap="round"/></svg>
-      <input id="q" type="search" placeholder="Search terms and notes" autocomplete="off" spellcheck="false" aria-label="Search terms and notes">
+      <input id="q" type="search" placeholder="Search concepts" autocomplete="off" spellcheck="false" aria-label="Search terms and explanations">
       <kbd aria-hidden="true">/</kbd>
     </label>
     <nav class="nav" id="nav" aria-label="Sections"></nav>
@@ -232,32 +260,39 @@ const main = $('#main');
 const q = $('#q');
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
-const topicById = Object.fromEntries(DATA.topics.map((t) => [t.id, t]));
-const allTerms = DATA.families.flatMap((f) => f.terms.map((t) => ({ ...t, family: f })));
-const backlinks = {};   // topic id → map terms that point into it
-for (const t of allTerms) for (const d of t.deep) (backlinks[d.topic] ??= []).some((b) => b.id === t.id) || backlinks[d.topic].push(t);
+const chapterById = Object.fromEntries(DATA.chapters.map((c) => [c.id, c]));
+const partByNum = Object.fromEntries(DATA.parts.map((p) => [p.num, p]));
+const allTerms = DATA.chapters.flatMap((c) => c.terms.map((t) => ({ ...t, chapter: c })));
+const chapterOfTerm = Object.fromEntries(allTerms.map((t) => [t.id, t.chapter.id]));
+const partTerms = (p) => p.chapters.reduce((n, id) => n + chapterById[id].terms.length, 0);
 
-// ── sidebar ──
-const SOON = ['Bug classes', 'Testing', 'Skills kit', 'Snippets', 'Lessons'];
-const group = (id, label, count, items) => `
+// ── sidebar: the book's contents, one accordion per part ──
+const SOON = ['Bug classes', 'Skills kit', 'Snippets', 'Lessons'];
+const group = (id, head, count, items) => `
   <section class="group" data-group="${id}">
     <button class="group-head" type="button" aria-expanded="false" aria-controls="g-${id}">
-      <span class="chev" aria-hidden="true"></span>${label}<span class="n">${count}</span>
+      <span class="chev" aria-hidden="true"></span>${head}<span class="n">${count}</span>
     </button>
     <ul class="group-body" id="g-${id}" hidden>${items}</ul>
   </section>`;
 $('#nav').innerHTML =
-  group('concepts', 'Concepts', allTerms.length,
-    `<li><a href="#concepts" data-view="concepts"><span>All concepts</span></a></li>` +
-    DATA.families.map((f) => `<li><a href="#${f.id}" data-fam="${f.id}"><span>${esc(f.name)}</span><span class="n">${f.terms.length}</span></a></li>`).join('')) +
-  group('notes', 'Your notes', DATA.topics.length,
-    DATA.topics.map((t) => `<li><a href="#${t.id}" data-view="${t.id}"><span>${esc(t.title)}</span></a></li>`).join('')) +
-  group('later', 'Coming later', SOON.length,
-    SOON.map((name) => `<li class="soon"><span>${name}</span></li>`).join(''));
+  `<a class="contents" href="#concepts" data-view="concepts"><span>Contents</span><span class="n">${allTerms.length}</span></a>` +
+  `<p class="nav-label">Concepts</p>` +
+  DATA.parts.map((p) => group(`part-${p.num}`, `<span class="part-num">${p.num}</span>${esc(p.name)}`, partTerms(p),
+    p.chapters.map((id) => {
+      const c = chapterById[id];
+      return `<li><a href="#${c.id}" data-view="${c.id}" class="${c.terms.length ? '' : 'is-empty'}">
+        <span class="ch"><span class="ch-num">${c.num}</span><span class="ch-title">${esc(c.title)}</span></span>
+        <span class="n">${c.terms.length || '–'}</span></a></li>`;
+    }).join(''))).join('') +
+  `<p class="nav-label">Later</p>` +
+  group('later', 'Coming later', SOON.length, SOON.map((name) => `<li class="soon"><span>${name}</span></li>`).join(''));
+$('#built').innerHTML = `Built ${esc(DATA.built)} from ${esc(DATA.commit)}.<br>Edit the markdown in knowledge/, then rebuild.`;
 
 // Accordion state: remembered in this browser (a convenience, so storage failing is fine).
-// The group you're in opens by itself; one you open or close by hand stays that way.
+// The part you're reading opens by itself; one you open or close by hand stays that way.
 const NAV_KEY = 'dev-notes:nav-groups';
 const navOpen = (() => { try { return JSON.parse(localStorage.getItem(NAV_KEY)) || {}; } catch { return {}; } })();
 const saveNav = () => { try { localStorage.setItem(NAV_KEY, JSON.stringify(navOpen)); } catch {} };
@@ -267,10 +302,12 @@ function setGroup(id, open) {
   head.setAttribute('aria-expanded', String(open));
   head.nextElementSibling.hidden = !open;
 }
-for (const id of ['concepts', 'notes', 'later']) setGroup(id, Boolean(navOpen[id]));
+document.querySelectorAll('.group').forEach((g) => setGroup(g.dataset.group, Boolean(navOpen[g.dataset.group])));
 let activeGroup = null;
 function openGroupFor(v) {
-  const id = v === 'concepts' ? 'concepts' : 'notes';
+  const c = chapterById[v];
+  if (!c) return;   // the contents page belongs to no single part
+  const id = `part-${c.part}`;
   if (id === activeGroup) return;
   if (activeGroup) setGroup(activeGroup, false);
   setGroup(id, true);
@@ -283,23 +320,16 @@ $('#nav').addEventListener('click', (e) => {
   setGroup(head.parentElement.dataset.group, head.getAttribute('aria-expanded') !== 'true');
   saveNav();
 });
-$('#built').innerHTML = `Built ${esc(DATA.built)} from ${esc(DATA.commit)}.<br>Edit the markdown in knowledge/, then rebuild.`;
 
 // ── one term row ──
 function termHTML(t, words) {
   const name = words ? highlight(t.name, words) : esc(t.name);
-  const deep = t.deep.map((d, i) => `
-    <button class="deep-toggle" type="button" aria-expanded="false" aria-controls="${t.id}-d${i}">
-      <span class="chev" aria-hidden="true"></span>Your notes<span class="where">${esc(topicById[d.topic].title)}${d.anchor === d.topic ? '' : ' › ' + esc(d.label)}</span>
-    </button>
-    <div class="deep" id="${t.id}-d${i}" hidden>
-      <div class="prose">${d.html}</div>
-      <a class="open" href="#${d.anchor}">Open ${esc(topicById[d.topic].title)} →</a>
-    </div>`).join('');
+  const deep = t.deep.map((d) => `
+    <a class="deep-link" href="#${d.anchor}"><span class="deep-word">Deep dive ↓</span><span class="where">${esc(d.label)}</span></a>`).join('');
   return `<article class="term" id="${t.id}">
     <h3 class="term-name">${name}${t.house ? '<span class="house" title="House term: coined in my projects">house</span>' : ''}</h3>
     <div class="term-body">
-      ${words ? `<span class="fam-label">${esc(t.family.name)}</span>` : ''}
+      ${words ? `<span class="where-label">${t.chapter.num}. ${esc(t.chapter.title)}</span>` : ''}
       ${t.translation ? `<p class="xlat">≈ ${t.translation}</p>` : ''}
       ${t.def ? `<p class="def">${t.def}</p>` : ''}
       ${deep}
@@ -308,42 +338,60 @@ function termHTML(t, words) {
 }
 
 // ── views ──
-function renderConcepts() {
-  const linked = allTerms.filter((t) => t.deep.length).length;
+function renderContents() {
+  const empty = DATA.chapters.filter((c) => !c.terms.length).length;
   const house = allTerms.filter((t) => t.house).length;
   main.innerHTML = `
     <header class="view-head">
       <p class="eyebrow">Knowledge</p>
       <h1>Concepts</h1>
-      <p class="lede">The engineering vocabulary I work with, grouped by family, one line per term. Where I've written a fuller definition in my own words, open <em>Your notes</em> under the term.</p>
-      <p class="meta">${allTerms.length} terms · ${DATA.families.length} families · ${linked} with my notes · ${house} house terms</p>
-      <p class="legend"><span class="house">house</span> A term coined in my projects. Useful, but translate it (≈) when talking to other engineers.</p>
+      <p class="lede">The engineering vocabulary I work with, arranged the way a reference book would arrange it: ${DATA.parts.length} parts, one chapter per topic. Each term gets one line; where I've written a fuller explanation in my own words, it sits in the same chapter.</p>
+      <p class="meta">${allTerms.length} terms · ${DATA.chapters.length} chapters · ${empty} still empty</p>
+      <p class="legend"><span class="house">house</span> ${house} terms coined in my projects. Useful, but translate them (≈) when talking to other engineers.</p>
     </header>
-    ${DATA.families.map((f) => `
-      <section class="family" id="${f.id}">
-        <header class="fam-head"><h2>${esc(f.name)}</h2><p>${esc(f.tagline)}</p><span class="count">${f.terms.length} terms</span></header>
-        ${f.terms.map((t) => termHTML(t)).join('')}
+    ${DATA.parts.map((p) => `
+      <section>
+        <header class="block-head"><h2>Part ${p.num} · ${esc(p.name)}</h2><span class="count">${plural(partTerms(p), 'term')}</span></header>
+        ${p.chapters.map((id) => {
+          const c = chapterById[id];
+          return `<a class="toc-row ${c.terms.length ? '' : 'is-empty'}" href="#${c.id}">
+            <span class="toc-num">${c.num}</span>
+            <span class="toc-title">${esc(c.title)}</span>
+            <span class="toc-count">${c.terms.length ? plural(c.terms.length, 'term') : '<span class="empty-tag">empty</span>'}</span>
+            <span class="toc-covers">${c.covers}</span>
+          </a>`;
+        }).join('')}
       </section>`).join('')}`;
 }
 
-function renderTopic(t) {
-  const back = backlinks[t.id] ?? [];
+function renderChapter(c) {
+  const i = DATA.chapters.indexOf(c);
+  const prev = DATA.chapters[i - 1];
+  const next = DATA.chapters[i + 1];
   main.innerHTML = `
     <header class="view-head">
-      <p class="eyebrow">Your notes</p>
-      <h1>${esc(t.title)}</h1>
-      <p class="lede">${t.covers}</p>
-      ${back.length ? `<p class="backlinks">In the concepts map:${back.map((b) => `<a href="#${b.id}">${esc(b.name)}</a>`).join('')}</p>` : ''}
+      <p class="eyebrow">Part ${c.part} · ${esc(partByNum[c.part].name)} · Chapter ${c.num}</p>
+      <h1>${esc(c.title)}</h1>
+      <p class="lede">${c.covers}</p>
     </header>
-    ${t.intro ? `<div class="prose">${t.intro}</div>` : ''}
-    ${t.sections.map((s) => `<section class="dd-section" id="${s.id}"><h2>${s.heading}</h2><div class="prose">${s.html}</div></section>`).join('')}`;
+    <section>
+      <header class="block-head"><h2>Terms</h2><span class="count">${c.terms.length || 'none yet'}</span></header>
+      ${c.terms.length ? c.terms.map((t) => termHTML({ ...t, chapter: c })).join('')
+        : `<p class="empty-note">No terms yet. This chapter marks where a reference book would cover this topic, so new terms have a home when you meet them.</p>`}
+    </section>
+    ${c.sections.length ? `
+      <section>
+        <header class="block-head"><h2>Deep dives</h2><span class="count">${c.sections.length}</span></header>
+        ${c.sections.map((s) => `<section class="dd-section" id="${s.id}"><h3>${s.heading}</h3><div class="prose">${s.html}</div></section>`).join('')}
+      </section>` : ''}
+    <nav class="page-turn" aria-label="Chapters">
+      ${prev ? `<a class="prev" href="#${prev.id}"><span class="dir">← Chapter ${prev.num}</span>${esc(prev.title)}</a>` : ''}
+      ${next ? `<a class="next" href="#${next.id}"><span class="dir">Chapter ${next.num} →</span>${esc(next.title)}</a>` : ''}
+    </nav>`;
 }
 
-// ── search: every word must appear in a term's name/definition or a note section's text ──
-const sectionIndex = DATA.topics.flatMap((t) => [
-  ...(t.introText ? [{ anchor: t.id, topic: t, heading: '', text: t.introText }] : []),
-  ...t.sections.map((s) => ({ anchor: s.id, topic: t, heading: s.plain, text: s.text })),
-]);
+// ── search: every word must appear in a term's name/definition or an explanation's text ──
+const sectionIndex = DATA.chapters.flatMap((c) => c.sections.map((s) => ({ anchor: s.id, chapter: c, heading: s.plain, text: s.text })));
 
 function highlight(str, words) {
   const safe = esc(str);
@@ -366,8 +414,8 @@ function renderSearch(query) {
     .map((t) => ({ t, rank: t.name.toLowerCase().startsWith(words[0]) ? 0 : has(t.name) ? 1 : 2 }))
     .sort((a, b) => a.rank - b.rank)
     .map(({ t }) => t);
-  const notes = sectionIndex.filter((s) => has(`${s.topic.title} ${s.heading} ${s.text}`));
-  const summary = [terms.length && `${terms.length} term${terms.length === 1 ? '' : 's'}`, notes.length && `${notes.length} note section${notes.length === 1 ? '' : 's'}`].filter(Boolean).join(' · ');
+  const found = sectionIndex.filter((s) => has(`${s.heading} ${s.text}`));
+  const summary = [terms.length && plural(terms.length, 'term'), found.length && plural(found.length, 'deep dive')].filter(Boolean).join(' · ');
   main.innerHTML = `
     <header class="view-head">
       <p class="eyebrow">Search</p>
@@ -375,11 +423,11 @@ function renderSearch(query) {
       <p class="lede">${summary || 'No matches.'}</p>
     </header>
     <div class="results">
-      ${!terms.length && !notes.length ? `<p class="empty">Search looks at term names, their one-line definitions and your notes. Try fewer words, or part of a word.</p>` : ''}
-      ${terms.length ? `<h2>Terms</h2>${terms.map((t) => termHTML(t, words)).join('')}` : ''}
-      ${notes.length ? `<h2>In your notes</h2>${notes.map((s) => `
+      ${!terms.length && !found.length ? `<p class="empty">Search looks at term names, their one-line definitions and the deep dives. Try fewer words, or part of a word.</p>` : ''}
+      ${terms.length ? `<header class="block-head"><h2>Terms</h2><span class="count">${terms.length}</span></header>${terms.map((t) => termHTML(t, words)).join('')}` : ''}
+      ${found.length ? `<header class="block-head"><h2>In the deep dives</h2><span class="count">${found.length}</span></header>${found.map((s) => `
         <a class="hit" href="#${s.anchor}">
-          <span class="hit-where">${esc(s.topic.title)}${s.heading ? ` <span>› ${highlight(s.heading, words)}</span>` : ''}</span>
+          <span class="hit-where">${highlight(s.heading, words)} <span>· ${s.chapter.num}. ${esc(s.chapter.title)}</span></span>
           <span class="hit-snip">${snippet(s.text, words)}</span>
         </a>`).join('')}` : ''}
     </div>`;
@@ -387,18 +435,18 @@ function renderSearch(query) {
   setCurrent(null);
 }
 
-// ── routing: the #hash picks the view; a family, term or section id scrolls within it ──
+// ── routing: the #hash picks the view — a chapter, or a term/explanation inside one ──
 let view = null;
 let first = true;
 function route() {
   const hash = decodeURIComponent(location.hash.slice(1)) || 'concepts';
-  const topic = topicById[hash.split('--')[0]];
-  const next = topic ? topic.id : 'concepts';
+  const chapter = chapterById[hash.split('--')[0]] ?? chapterById[chapterOfTerm[hash]];
+  const next = chapter ? chapter.id : 'concepts';
   if (next !== view) {
-    if (topic) renderTopic(topic); else renderConcepts();
+    if (chapter) renderChapter(chapter); else renderContents();
     view = next;
   }
-  setCurrent(next, hash);
+  setCurrent(next);
   openGroupFor(next);
   const target = hash === next ? null : document.getElementById(hash);
   // after layout settles (and again once fonts load, which shifts it) so the target stays in view
@@ -408,22 +456,11 @@ function route() {
   document.body.classList.remove('nav-open');
   $('#menu').setAttribute('aria-expanded', 'false');
 }
-function setCurrent(v, hash) {
-  document.querySelectorAll('.nav a').forEach((a) => {
-    const on = (a.dataset.view === v && !(v === 'concepts' && hash?.startsWith('f-'))) || (a.dataset.fam !== undefined && a.dataset.fam === hash);
-    a.setAttribute('aria-current', on ? 'true' : 'false');
-  });
+function setCurrent(v) {
+  document.querySelectorAll('.nav a').forEach((a) => a.setAttribute('aria-current', a.dataset.view === v ? 'true' : 'false'));
 }
 
 // ── events ──
-main.addEventListener('click', (e) => {
-  const toggle = e.target.closest('.deep-toggle');
-  if (toggle) {
-    const open = toggle.getAttribute('aria-expanded') !== 'true';
-    toggle.setAttribute('aria-expanded', String(open));
-    document.getElementById(toggle.getAttribute('aria-controls')).hidden = !open;
-  }
-});
 document.addEventListener('click', (e) => {   // following a link out of search clears it
   const link = e.target.closest('a[href^="#"]');
   if (!link || !q.value) return;

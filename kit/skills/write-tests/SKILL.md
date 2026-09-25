@@ -129,7 +129,7 @@ blank page in production.
 | A decision ("never write X", "always shape Y") | A pin naming the decision in its test name |
 | Dormant / data-gated code | Inertness pin + a fake-driven unit matrix for the new branch |
 | An external contract (vendor payload, API shape) | A fixture replay test with pseudonymized captured data |
-| Hard to unit-test (real browser, real integration) | Escalate a tier — see the ladder in `.claude/knowledge/testing.md` — or a written manual QA checklist with observable must-pass checks |
+| Hard to unit-test (real browser, real integration) | Escalate a tier — see the ladder in `.claude/knowledge/concepts/testing.md` — or a written manual QA checklist with observable must-pass checks |
 
 ---
 
@@ -140,6 +140,6 @@ blank page in production.
 - `log-implementation` — every entry reports the suite result (`N/N` + case list) as evidence.
 - `write-handoff` — new pins/tripwires and their flip conditions go in the handoff's DO-NOT list;
   the tests README is a row in the pre-handoff sweep.
-- `.claude/knowledge/testing.md` — the full reference: all test kinds, when to reach for each,
+- `.claude/knowledge/concepts/testing.md` — the full reference: all test kinds, when to reach for each,
   and the growth ladder (coverage → property-based → mutation → integration → E2E → CI; the
   integration rung can come early for boundary-heavy projects).

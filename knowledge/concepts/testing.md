@@ -1,7 +1,13 @@
-# Test Taxonomy — reference
+# Testing
 
-Companion to the `write-tests` skill. Two sections: the kinds of tests (conventional first, then agentic
-extensions), and the growth ladder for adopting heavier tooling deliberately.
+> **Covers:** How behavior is verified: the kinds of tests, the house test types, and the ladder for adopting heavier tooling one rung at a time.
+
+## Terms
+
+- **regression** — something that used to work breaking again
+- 🏠 **pin** (≈ regression test freezing a decision) · 🏠 **tripwire** (≈ canary test designed to
+  redden on a planned event) · 🏠 **drift guard / parity test** (≈ consistency check between
+  deliberate copies)
 
 ## Conventional kinds (industry-standard vocabulary)
 

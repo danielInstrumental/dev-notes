@@ -68,12 +68,12 @@ note covering:
 
 ## Related
 
-- `.claude/knowledge/concepts/README.md` — the **living map** of concept families the coaching draws
-  from when naming unknown unknowns: conventional terms unmarked, house-style terms flagged with
-  their professional translation. **It is open by design — when coaching surfaces a term not on
-  the map, add it** (see the file's grow-rules).
+- `.claude/knowledge/concepts/` — the **living map** of concepts the coaching draws from when
+  naming unknown unknowns, one file per chapter (`README.md` is the table of contents): conventional terms unmarked, house-style terms flagged with
+  their professional translation. **It is open by design — when coaching surfaces a term not in
+  any chapter, add it** to the chapter whose Covers line fits (see the README's grow-rules).
 - `.claude/knowledge/bug-classes.md` — the sibling living map of **bug classes** (the recurring
   ways systems fail), organized for recognition: symptom → class name → standard mitigations.
   Same grow-rules; when a session's bug fits a class, name it — when it doesn't, add the class.
 - A per-project glossary (project-specific terminology, defined in my own words) pairs well with
-  this loop — the running cross-project version is the deep-dive files in `.claude/knowledge/concepts/`.
+  this loop — the running cross-project version is the own-words explanations inside those chapters.
