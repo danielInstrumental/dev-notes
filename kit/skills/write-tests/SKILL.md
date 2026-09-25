@@ -1,6 +1,6 @@
 ---
 name: write-tests
-description: How to write and maintain tests — conventional foundations (test pyramid, AAA structure, test-with-the-change, a regression test per bug fix by default, hermetic rules) plus agentic extensions (pins, drift guards, tripwires). Use when writing any test, choosing what kind of test a change needs, or setting up a new project's suite.
+description: How to write and maintain tests — conventional foundations (test pyramid, AAA structure, test-with-the-change, bug fixes close behavior-test gaps, test behavior not implementation, hermetic rules) plus agentic extensions (pins, drift guards, tripwires). Use when writing any test, choosing what kind of test a change needs, or setting up a new project's suite.
 ---
 
 # Write Tests
@@ -39,35 +39,46 @@ predicted-test-impact section feeds this), fixing a bug, or setting up a new pro
 2. **Tests ship WITH the change — same unit, same commit.** "Tests later" never comes. The strict
    version is **TDD**: write the failing test first (red) → minimum code to pass (green) →
    refactor. The minimum bar is test-with-the-change.
-3. **A bug fix gets a regression test by default** — the test that would have caught it, run
-   BEFORE the fix to watch it fail. A test never seen red proves nothing (it may pass vacuously).
-   Skip it only for a named reason, and say the reason in the commit or log:
-   - **cosmetic** (copy, CSS, a color) — the test would just restate the fix, a *change-detector
-     test* that breaks on every intended change and never catches a real bug;
-   - **data / config** — fix the data, or add validation that rejects it;
-   - **external system** — you can't unit-test their code: a fixture/contract test, monitoring,
-     or a documented quirk instead;
-   - **a lint rule catches it better** — a whole class beats one instance (see the static gate);
-   - **not reproducible yet** — a flaky test is worse than none: add logging or an assertion first.
+3. **A bug fix closes a gap in behavior testing — it doesn't add a test per bug.** First ask
+   *why the existing tests didn't catch it*:
+   - **a behavior wasn't tested** → add a test for that BEHAVIOR, named for the behavior
+     ("rejects an empty email"), not for the bug ("bug #42");
+   - **a test existed but was too weak** → strengthen that test instead of adding a new one;
+   - **no behavior gap** → no new test. Typical cases: **cosmetic** (the test would just restate
+     the fix — a change-detector test, see 4) · **data / config** (fix the data, or add validation
+     that rejects it) · **external system** (a fixture/contract test, monitoring, or a documented
+     quirk) · **a lint rule catches the whole class better** (see the static gate) · **not
+     reproducible yet** (add logging or an assertion first — a flaky test is worse than none).
 
-   The deciding question: *if this broke again, would a test be what catches it — and is it worth
-   maintaining?*
-4. **Structure: Arrange – Act – Assert.** Set up state, do the one thing, check the one outcome.
+   Whichever test you add or strengthen, run it BEFORE the fix and watch it fail — a test never
+   seen red proves nothing. Record the reason for a no-test decision in the commit or log.
+4. **Test behavior, not implementation.** Assert what the code does for its caller — outputs,
+   stored results, what the user sees — never how it does it (private helpers, internal call
+   order, internal structure). Checking that a boundary was called (an email sent, an API
+   written) IS behavior; checking the order of internal calls is not. Two shapes to avoid:
+   - **tautological test** — the expected value is computed with the code's own logic, or
+     everything is mocked and the test checks the mock. It can't fail. Use an independently known
+     answer: `total([{price: 2}, {price: 3}])` is `5`.
+   - **change-detector test** — it restates incidental details (an exact color, a copy string,
+     internal shape), so it breaks on every intended change and never on a real bug.
+
+   A good test fails when behavior breaks and survives a refactor.
+5. **Structure: Arrange – Act – Assert.** Set up state, do the one thing, check the one outcome.
    One behavior per test; the test NAME states the behavior ("rejects a submission missing a
    required field") so a red test is its own bug report.
-5. **Test doubles — use the right one and the right word:** **stub** (canned answers) · **mock**
+6. **Test doubles — use the right one and the right word:** **stub** (canned answers) · **mock**
    (canned answers + verifies how it was called) · **fake** (working lightweight substitute, e.g.
    an in-memory client) · **fixture** (canned data, e.g. a captured real payload — pseudonymize
    any real-user data before committing it).
-6. **Hermetic by default.** Unit tests never touch network, filesystem, clock, or randomness —
+7. **Hermetic by default.** Unit tests never touch network, filesystem, clock, or randomness —
    inject those through seams. A hermetic suite is safe to run anytime, anywhere, repeatedly.
-7. **Test the matrix, not just the happy path:** each failure mode, boundary cases (empty / null /
+8. **Test the matrix, not just the happy path:** each failure mode, boundary cases (empty / null /
    malformed / equal-dates), and the no-op cases (nothing changed → nothing written).
-8. **CI is the enforcement layer.** Professionals run the suite automatically on every push/PR
+9. **CI is the enforcement layer.** Professionals run the suite automatically on every push/PR
    (e.g. GitHub Actions) and a red suite BLOCKS the merge. Without CI, every constraint is
    optional — if this project lacks CI, the config block above must say so and the suite runs
    manually before every handoff, no exceptions.
-9. **Coverage is a gap-finder, never a target.** Use it to discover untested branches; never chase
+10. **Coverage is a gap-finder, never a target.** Use it to discover untested branches; never chase
    a percentage (Goodhart's law — tests written to hit a number verify nothing).
 
 ---
@@ -135,7 +146,7 @@ blank page in production.
 | The change is… | Write… |
 |---|---|
 | New pure logic (validator, transform, guard) | Unit tests for the matrix (happy / failures / boundaries / no-ops) — TDD if the spec is clear |
-| A bug fix | By default, the regression test FIRST (watch it fail), then the fix — or a named skip reason (foundation 3) |
+| A bug fix | Find the behavior gap (foundation 3): add or strengthen that behavior's test, watch it fail, then fix — no gap, no new test |
 | Touching a deliberate duplicate | Run + extend the parity guard; register in the guards registry |
 | A decision ("never write X", "always shape Y") | A pin naming the decision in its test name |
 | Dormant / data-gated code | Inertness pin + a fake-driven unit matrix for the new branch |

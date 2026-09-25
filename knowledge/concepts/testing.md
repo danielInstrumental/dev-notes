@@ -7,6 +7,10 @@
 - **regression** — something that used to work breaking again
 - **change-detector test** — a test that just restates the code (e.g. `expect(color).toBe('#333')`), so
   it breaks on every intended change and never catches a real bug — an anti-pattern
+- **tautological test** — a test that can't fail: its expected value is computed with the code's own
+  logic, or it only checks what its mocks were told to return — an anti-pattern
+- **test behavior, not implementation** — assert what code does for its caller, not how it does it;
+  a good test fails when behavior breaks and survives a refactor
 - 🏠 **pin** (≈ characterization / regression test freezing a decided behavior) · 🏠 **tripwire** (≈
   canary test designed to redden on a planned event) · 🏠 **drift guard / parity test** (≈
   consistency check between deliberate copies)
@@ -19,7 +23,7 @@
 | **Integration** | Several real pieces together (module + real DB, two services) | The pieces actually fit — wiring, schemas, auth | Same runners + real/containerized deps |
 | **End-to-end (E2E)** | The real app, driven like a user, minutes | The whole system works for a real flow | Playwright, Cypress |
 | **Smoke** | A handful of E2E-ish checks after a deploy | The deploy didn't brick the core paths | A tagged subset of E2E |
-| **Regression** | Any tier | A previously-fixed bug stays fixed; a decided behavior stays decided | Ordinary tests, written for most bug fixes (not cosmetic ones) |
+| **Regression** | Any tier | A previously-fixed bug stays fixed; a decided behavior stays decided | Ordinary behavior tests — added or strengthened when a bug reveals an untested behavior |
 | **Acceptance / UAT** | Human or automated, against requirements | The feature does what the stakeholder asked | Manual scripts with must-pass checklists; BDD |
 | **BDD / Gherkin** | Requirements as executable `Given/When/Then` | The spec itself is testable — no reinterpretation gap | Cucumber, SpecFlow |
 | **Contract** | The boundary between two systems | Each side honors the agreed request/response shapes | Pact; fixture-replay tests |
