@@ -154,7 +154,9 @@
   .term-body > p { margin: 0; }
   .xlat { color: var(--house); }
   .xlat + .def { margin-top: .2rem; }
-  .where-label { display: block; font: 400 .75rem/1.5 var(--sans); color: var(--faint); }
+  .crumb { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 .35rem; margin-bottom: .15rem; font: 400 .76rem/1.5 var(--sans); color: var(--faint); text-decoration: none; }
+  a.crumb:hover { color: var(--accent); }
+  .crumb-part { font-family: var(--mono); font-size: .72rem; }
   .house {
     font: 600 .62rem/1 var(--sans); text-transform: uppercase; letter-spacing: .08em;
     color: var(--house); background: var(--house-soft); border-radius: 3px; padding: .25rem .35rem .2rem;
@@ -206,7 +208,6 @@
   .hit { display: block; padding: .8rem .6rem; margin-inline: -.6rem; border-bottom: 1px solid var(--line); text-decoration: none; color: var(--ink); border-radius: 4px; }
   .hit:hover { background: var(--surface); }
   .hit-where { display: block; font-weight: 600; color: var(--accent); font-size: .92rem; }
-  .hit-where span { color: var(--faint); font-weight: 400; }
   .hit-snip { display: block; color: var(--muted); font-size: .9rem; margin-top: .15rem; }
   .empty { color: var(--muted); }
 
@@ -321,15 +322,18 @@ $('#nav').addEventListener('click', (e) => {
   saveNav();
 });
 
+// "IV Changing it › 12 Delivery & version control"
+const crumb = (c) => `<span class="crumb-part">${c.part} ${esc(partByNum[c.part].name)}</span><span aria-hidden="true">›</span><span>${c.num} ${esc(c.title)}</span>`;
+
 // ── one term row ──
 function termHTML(t, words) {
   const name = words ? highlight(t.name, words) : esc(t.name);
   const deep = t.deep.map((d) => `
     <a class="deep-link" href="#${d.anchor}"><span class="deep-word">Deep dive ↓</span><span class="where">${esc(d.label)}</span></a>`).join('');
   return `<article class="term" id="${t.id}">
-    <h3 class="term-name">${name}${t.house ? '<span class="house" title="House term: coined in my projects">house</span>' : ''}</h3>
+    <h3 class="term-name"><span>${name}</span>${t.house ? '<span class="house" title="House term: coined in my projects">house</span>' : ''}</h3>
     <div class="term-body">
-      ${words ? `<span class="where-label">${t.chapter.num}. ${esc(t.chapter.title)}</span>` : ''}
+      ${words ? `<a class="crumb" href="#${t.id}" aria-label="Open in chapter ${t.chapter.num}, ${esc(t.chapter.title)}">${crumb(t.chapter)}</a>` : ''}
       ${t.translation ? `<p class="xlat">≈ ${t.translation}</p>` : ''}
       ${t.def ? `<p class="def">${t.def}</p>` : ''}
       ${deep}
@@ -427,7 +431,8 @@ function renderSearch(query) {
       ${terms.length ? `<header class="block-head"><h2>Terms</h2><span class="count">${terms.length}</span></header>${terms.map((t) => termHTML(t, words)).join('')}` : ''}
       ${found.length ? `<header class="block-head"><h2>In the deep dives</h2><span class="count">${found.length}</span></header>${found.map((s) => `
         <a class="hit" href="#${s.anchor}">
-          <span class="hit-where">${highlight(s.heading, words)} <span>· ${s.chapter.num}. ${esc(s.chapter.title)}</span></span>
+          <span class="crumb">${crumb(s.chapter)}</span>
+          <span class="hit-where">${highlight(s.heading, words)}</span>
           <span class="hit-snip">${snippet(s.text, words)}</span>
         </a>`).join('')}` : ''}
     </div>`;
