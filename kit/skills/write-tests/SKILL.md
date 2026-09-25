@@ -1,6 +1,6 @@
 ---
 name: write-tests
-description: How to write and maintain tests — conventional foundations (test pyramid, AAA structure, test-with-the-change, regression-test-per-bug-fix, hermetic rules) plus agentic extensions (pins, drift guards, tripwires). Use when writing any test, choosing what kind of test a change needs, or setting up a new project's suite.
+description: How to write and maintain tests — conventional foundations (test pyramid, AAA structure, test-with-the-change, a regression test per bug fix by default, hermetic rules) plus agentic extensions (pins, drift guards, tripwires). Use when writing any test, choosing what kind of test a change needs, or setting up a new project's suite.
 ---
 
 # Write Tests
@@ -39,8 +39,19 @@ predicted-test-impact section feeds this), fixing a bug, or setting up a new pro
 2. **Tests ship WITH the change — same unit, same commit.** "Tests later" never comes. The strict
    version is **TDD**: write the failing test first (red) → minimum code to pass (green) →
    refactor. The minimum bar is test-with-the-change.
-3. **Every bug fix ships with the regression test that would have caught it — and run it BEFORE
-   the fix to watch it fail.** A test never seen red proves nothing (it may pass vacuously).
+3. **A bug fix gets a regression test by default** — the test that would have caught it, run
+   BEFORE the fix to watch it fail. A test never seen red proves nothing (it may pass vacuously).
+   Skip it only for a named reason, and say the reason in the commit or log:
+   - **cosmetic** (copy, CSS, a color) — the test would just restate the fix, a *change-detector
+     test* that breaks on every intended change and never catches a real bug;
+   - **data / config** — fix the data, or add validation that rejects it;
+   - **external system** — you can't unit-test their code: a fixture/contract test, monitoring,
+     or a documented quirk instead;
+   - **a lint rule catches it better** — a whole class beats one instance (see the static gate);
+   - **not reproducible yet** — a flaky test is worse than none: add logging or an assertion first.
+
+   The deciding question: *if this broke again, would a test be what catches it — and is it worth
+   maintaining?*
 4. **Structure: Arrange – Act – Assert.** Set up state, do the one thing, check the one outcome.
    One behavior per test; the test NAME states the behavior ("rejects a submission missing a
    required field") so a red test is its own bug report.
@@ -124,7 +135,7 @@ blank page in production.
 | The change is… | Write… |
 |---|---|
 | New pure logic (validator, transform, guard) | Unit tests for the matrix (happy / failures / boundaries / no-ops) — TDD if the spec is clear |
-| A bug fix | The regression test FIRST (watch it fail), then the fix |
+| A bug fix | By default, the regression test FIRST (watch it fail), then the fix — or a named skip reason (foundation 3) |
 | Touching a deliberate duplicate | Run + extend the parity guard; register in the guards registry |
 | A decision ("never write X", "always shape Y") | A pin naming the decision in its test name |
 | Dormant / data-gated code | Inertness pin + a fake-driven unit matrix for the new branch |
