@@ -16,32 +16,32 @@ _Definitions are project-neutral. They started as notes from real projects, but 
 
 ## Contents
 
-### Part I — Building blocks
+### Part I — Software Design
 
 1. [Design & structure](design-and-structure.md)
 2. [Data & state](data-and-state.md)
 3. [Functions, effects & flow](functions-effects-and-flow.md)
+4. [Concurrency](concurrency.md)
 
-### Part II — Keeping it right
+### Part II — Software Quality & Testing
 
-4. [Correctness](correctness.md)
-5. [Errors & reliability](errors-and-reliability.md)
-6. [Concurrency](concurrency.md)
+5. [Correctness](correctness.md)
+6. [Errors & reliability](errors-and-reliability.md)
 7. [Security](security.md)
 8. [Testing](testing.md)
 9. [Performance](performance.md)
 
-### Part III — Connecting systems
+### Part III — Systems Integration
 
 10. [Integration & APIs](integration-and-apis.md)
 
-### Part IV — Changing it
+### Part IV — Maintenance & Operations
 
 11. [Change & maintenance](change-and-maintenance.md)
 12. [Delivery & version control](delivery-and-version-control.md)
 13. [Operations & observability](operations-and-observability.md)
 
-### Part V — How we work
+### Part V — Process & Practice
 
 14. [Documentation & knowledge](documentation-and-knowledge.md)
 15. [Planning & prioritization](planning-and-prioritization.md)
