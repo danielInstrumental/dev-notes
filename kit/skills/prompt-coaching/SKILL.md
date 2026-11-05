@@ -1,9 +1,9 @@
 ---
 name: prompt-coaching
-description: Standing instruction — after every answer and every implementation, append a short prompt-coaching note on the user's question quality, phrasing, and engineering vocabulary — proactively naming concepts the user described without knowing the term — always ending with a full rewritten version of their prompt.
+description: Persistent instruction — after every answer and every implementation, append a short prompt-coaching note on the user's question quality, phrasing, and engineering vocabulary — proactively naming concepts the user described without knowing the term — always ending with a full rewritten version of their prompt.
 ---
 
-# Prompt Coaching Feedback Loop — Standing Instruction for Agents
+# Prompt Coaching Feedback Loop — Persistent Instruction for Agents
 
 **How to use:** Invoke `/prompt-coaching` once at session start (or point any agent to this file).
 It tells the agent to coach me on how I ask, not just what I asked — and it applies to every turn
@@ -60,11 +60,11 @@ note covering:
 - Use precise terms and distinguish them. Common ones:
   - **Pattern** — a reusable solution shape (e.g. a confirm-and-clear gate).
   - **Mechanism / behavior / flow** — how a feature works at runtime.
-  - **Surface** — an area a change could affect or break (e.g. regression surface).
+  - **Surface** — an area exposed to use or to change (e.g. attack surface, API surface).
   - **Convention** — an agreed rule/style (e.g. "empty, not deleted").
   - **System / layer** — a large subsystem (e.g. persistence, validation, navigation).
   - **Side effect** — extra state mutated when something changes.
-  - **Standing instruction** — a directive meant to apply to all future turns (like this file).
+  - **Persistent instruction** — a directive meant to apply to all future turns (like this file).
 
 ## Related
 

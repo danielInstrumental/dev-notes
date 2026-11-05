@@ -20,10 +20,10 @@ These skills are a **system**, not independent documents. Together they enforce 
 SESSION START ──▶ read the top handoff, verify state, brief the user   (/session-startup)
       │
       ▼
-PLAN ──────────▶ ground in code, build the impact model, get the "go"  (/plan-first
+PLAN ──────────▶ ground in code, run the impact analysis, get the "go"  (/plan-first
       │                                                                 + its checklist)
       ▼
-IMPLEMENT ─────▶ exactly the approved edits, stop on surprise
+IMPLEMENT ─────▶ exactly the approved edits, stop the line on surprise
       │
       ▼
 VERIFY ────────▶ agent pre-checks, then the USER verifies in the real environment
@@ -41,14 +41,14 @@ SESSION END ───▶ current-state sweep + write the handoff               (
 |---|---|---|
 | [`session-startup/`](skills/session-startup/SKILL.md) | Required reading, standing rules, verify-state-with-commands, the 4-part briefing | First thing, every session |
 | [`plan-first/`](skills/plan-first/SKILL.md) | The plan-first workflow (Phases 0–8) + the guards registry template | Before ANY code change |
-| ↳ [`change-impact-checklist.md`](skills/plan-first/change-impact-checklist.md) | The dependency-impact checklist (§§1–8) the plan phases walk | Inside plan Phases 2 and 7 |
+| ↳ [`change-impact-checklist.md`](skills/plan-first/change-impact-checklist.md) | The change impact checklist (§§1–8) the plan phases walk | Inside plan Phases 2 and 7 |
 | [`log-implementation/`](skills/log-implementation/SKILL.md) | One as-built entry per verified unit of change | After each user-verified change |
-| [`write-tests/`](skills/write-tests/SKILL.md) | Conventional testing practice (pyramid, AAA, test-with-the-change) + agentic pins/guards/tripwires | Writing any test; choosing what kind a change needs |
+| [`write-tests/`](skills/write-tests/SKILL.md) | Conventional testing practice (pyramid, AAA, test-with-the-change) + regression, differential and expected-failure tests | Writing any test; choosing what kind a change needs |
 | ↳ [`knowledge/concepts/testing.md`](../knowledge/concepts/testing.md) | All test kinds + the growth ladder (coverage → property-based → mutation → integration → E2E → CI) | Reference, on demand |
 | [`write-commits/`](skills/write-commits/SKILL.md) | Commit message conventions — Conventional Commits types + the seven timeless rules | Every commit / commit recommendation |
 | [`write-handoff/`](skills/write-handoff/SKILL.md) | The 13-section session handoff + the pre-handoff staleness sweep | Once, at session end |
-| [`comment-protocol/`](skills/comment-protocol/SKILL.md) | The agent-legible annotation system: decision fingerprints, KIND/flip-condition headers, KEEP-IN-SYNC markers, dated claims, negative documentation, the stranger test | Day one of a new project; auditing an existing one |
-| [`prompt-coaching/`](skills/prompt-coaching/SKILL.md) | Standing instruction: coach the user's prompts every turn | Every turn, every session (standing rule) |
+| [`comment-protocol/`](skills/comment-protocol/SKILL.md) | The agent-legible annotation system: why-comments, KIND/flip-condition headers, KEEP-IN-SYNC markers, dated claims, negative documentation, the stranger test | Day one of a new project; auditing an existing one |
+| [`prompt-coaching/`](skills/prompt-coaching/SKILL.md) | Persistent instruction: coach the user's prompts every turn | Every turn, every session (standing rule) |
 | ↳ [`knowledge/concepts/`](../knowledge/concepts/README.md) | The concepts book: engineering vocabulary in 16 chapters (conventional vs house-style) — grows with every project | Reference the coaching draws from |
 | ↳ [`knowledge/bug-classes.md`](../knowledge/bug-classes.md) | Living map of bug classes — symptom → class name → standard mitigations | Named aloud whenever a session hits a bug |
 
@@ -98,7 +98,7 @@ Projects differ in size and risk; the kit must scale its own adoption, in BOTH d
 
 **Don't adopt by default (YAGNI).** The minimal, non-skippable core for ANY project is the loop
 itself: `session-startup` + `plan-first` + `write-handoff`, their data files, and the standing
-rules (stop-on-surprise, one-unit-per-verify, no code without a "go"). Everything else adopts on
+rules (stop the line on surprise, small batches, no code without a "go"). Everything else adopts on
 its trigger:
 
 | Piece | Adopt when |
@@ -136,7 +136,7 @@ carries the distilled rule; the lesson file carries the narrative.
 ## Design principles baked into these skills
 
 - **Understand first, plan second, execute last.** No code without a grounded plan and an explicit "go".
-- **One unit of change per verify cadence.** Never batch ahead of verification.
+- **Small batches — one unit of change at a time.** Never batch ahead of verification.
 - **Ground against the code, not the notes.** Logs and old plans rot; the code is the truth.
 - **Append-only logs never rot; current-state docs do.** Every current-state doc needs an update
   trigger — that's what the pre-handoff sweep is for.

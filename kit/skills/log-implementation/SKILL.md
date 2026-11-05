@@ -67,13 +67,13 @@ exactness (every file edited with its path, every bug # filed/resolved).
 
 **External-system changes (if any):** properties / options / config created, verified live via <tool>.
 **Edits:** lettered (A1, B1, C1 …), each with **exact file:line** + what changed + why.
-  Flag any deliberately duplicated logic edited in ALL its copies (KEEP-IN-SYNC + which parity
-  check was run).
-**Validator drift:** "none required (+ why)" OR which copies of a multi-copy rule were updated
+  Flag any deliberately duplicated logic edited in ALL its copies (KEEP-IN-SYNC + which
+  differential test was run).
+**Duplicated rules:** "none required (+ why)" OR which copies of a multi-copy rule were updated
   as a SET.
 **Known limitation / cleanup:** accepted trade-offs; any TEMP scaffolding owed removal (or "none").
 **Pre-merge checks:** syntax check, test suite **N/N** (with the case list), diagnostics.
-**Verified <YYYY-MM-DD> (user):** the observed evidence — the must-pass checks, with the date.
+**Verified <YYYY-MM-DD> (user):** the observed evidence — the acceptance criteria, with the date.
 **Bug delta:** `#N NEW` / `#N ✅ RESOLVED` (or "none"). Deploy note if merged ≠ deployed.
 ```
 

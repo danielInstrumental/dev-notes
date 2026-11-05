@@ -57,7 +57,7 @@ Sections in this order (omit ones that genuinely don't apply; don't invent new o
   the project nouns removed ("a handoff said commit owed; git was already clean"). No bug numbers,
   file paths, or vendor names from a specific project.
 - **Rules state their WHY** when the why is what makes them stick ("never delete-to-green — a red
-  tripwire is the signal working").
+  expected-failure test is the signal working").
 - Emphasis (bold/CAPS) marks the load-bearing words, not decoration.
 
 ## Size — progressive disclosure

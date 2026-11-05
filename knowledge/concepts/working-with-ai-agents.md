@@ -4,5 +4,6 @@
 
 ## Terms
 
-- 🏠 **standing instruction** (≈ a persistent instruction, like a system prompt or a CLAUDE.md rule,
-  that applies to every future turn)
+- **persistent instructions** — instructions that apply to every future turn, like a system prompt
+  or a CLAUDE.md rule; Claude Code calls CLAUDE.md files **memory** (formerly "standing
+  instruction" in this kit)

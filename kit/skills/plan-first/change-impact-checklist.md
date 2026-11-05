@@ -2,7 +2,7 @@
 
 > ## Project Configuration — fill in per project
 > - List the project's concrete instances under each generic item as you discover them (validation
->   entry points, summary views, label/display maps, load-time auto-writers, the fixed set of
+>   entry points, summary views, label/display maps, on-load side effects, the fixed set of
 >   inbound/seed paths). The checklist gets MORE specific over the project's life — that's the point.
 > - **Test suite command:** <e.g. `npm test` — all green before hand-off>
 
@@ -66,21 +66,21 @@ What else gets mutated when it changes?
 - [ ] **Hardcoded default key arrays** — are there key lists that need updating?
 - [ ] Re-validation triggers (real-time invalidation, navigate-away re-validation)
 - [ ] Cascading state updates
-- [ ] **State-machine CROSSINGS** (a known checklist blind spot): if the change involves
+- [ ] **State transition testing** (a known checklist blind spot): if the change involves
       states/statuses, cross **each user action × each state transition** (e.g. dismissing a banner
       during `processing` must not suppress the later `ready`), and ask **"what does SUCCESS
       disable?"** and **"what does FAILURE retry, and what marker does a failed attempt consume?"**
       (a "once" marker must mean once SUCCESSFULLY). Walk every state's exits — a state without a
       user exit is a trap.
-- [ ] **Load-time AUTO-WRITERS** — does the change interact with (or ADD) an effect that writes
+- [ ] **On-load side effects** — does the change interact with (or ADD) an effect that writes
       state on page open with NO user action (id back-fills, heal-on-load saves, migrations,
       navigate-away writes)? Server-injected state meets these effects BEFORE any user edit, and
       they amplify multi-tab races (each fires a save just from opening a page). Keep the project's
-      fixed set of auto-writers listed here.
+      fixed set of on-load writers listed here.
 - [ ] **New protective guard? Re-walk every path that previously DELETED or OVERWROTE the protected
       thing** — each such path's outcome silently changes and must become a named decision.
 - [ ] **Client concurrency / MULTI-TAB** — does the change read-modify-write SHARED state? If there
-      is no version/etag guard, saves are last-writer-wins, and load-time auto-writers fire saves
+      is no version/etag guard, saves are last-writer-wins, and on-load side effects fire saves
       from merely opening a page. Ask: what does a second/stale tab do to this change, and does the
       change make a stale tab's save MORE destructive? Name the accepted posture — don't leave it
       unexamined.
@@ -124,10 +124,11 @@ Test these surfaces before marking done:
       QUESTION, never a pass** (attribute every record). The baseline also QUARANTINES pre-existing
       anomalies so they can't masquerade as effects of the change.
 - [ ] **The test suite** — all green before hand-off. If a test REDDENS, identify its KIND first —
-      pins/tripwires are DESIGNED to fail on certain changes and must be flipped WITH the change
-      (never deleted-to-green); drift guards mean update BOTH copies.
-- [ ] **Dev-toggle / param-gated features** — the OFF state is the must-pass: with the toggle
-      absent, the app must be pixel-identical.
+      regression tests for decisions and expected-failure tests are DESIGNED to fail on certain
+      changes and must be flipped WITH the change (never deleted-to-green); a red differential
+      test means update BOTH copies.
+- [ ] **Feature-flagged (param-gated) features** — the OFF state is an acceptance criterion: with
+      the flag absent, the app must be pixel-identical.
 
 ---
 
@@ -152,7 +153,7 @@ by an id, not just in-app state.
 - [ ] **Stable identity key** minted at the SOURCE and carried through (array index is NOT
       identity — reindexing on delete corrupts an index-keyed sync).
 - [ ] **Running it twice is safe** (converges, no duplicates). Explicitly test the re-run.
-- [ ] **Deletes detected by ABSENCE** (diff desired-vs-current), not by catching an event — a
+- [ ] **Deletes detected by reconciliation** (diff desired-vs-current), not by catching an event — a
       removed item is just *gone* from the source.
 - [ ] **Edit ≠ delete:** a record mid-edit (temporarily not "committed") must NOT be archived as an
       orphan — orphan-detection compares against ALL present source ids, not just committed ones.
@@ -176,8 +177,8 @@ by an id, not just in-app state.
 ### D. Rate limits, batching, cadence
 - [ ] **Call count per operation** (N records → N calls?). Use batch APIs to bound it regardless of N.
 - [ ] **Retry configured** for 429/5xx (many clients need it enabled explicitly).
-- [ ] **Trigger cadence:** how often does it fire (every keystroke-save? milestone? submit)? Add a
-      delta-check to skip no-ops if chatty.
+- [ ] **Trigger cadence:** how often does it fire (every keystroke-save? milestone? submit)? Add
+      change detection (a dirty check) to skip no-ops if chatty.
 - [ ] **VOLUME-CASCADE audit:** if the change alters a VOLUME assumption (a new writer, a pagination
       fix, a bigger batch), re-audit EVERY downstream consumer of that volume: single-page reads
       with no cursor loop, batch-call input caps, and **ordering/positional assumptions in result
@@ -202,7 +203,7 @@ by an id, not just in-app state.
 
 ### F. Migration / parallel-run
 - [ ] If replacing an existing projection, run **BOTH in parallel** until verified (strangler
-      migration); state which is **authoritative**.
+      fig pattern / parallel run); state which is **authoritative**.
 - [ ] **Legacy data:** does existing data have the new identity key? Backfill plan — or N/A.
 - [ ] **Verify on a BRAND-NEW record** (true zero state), not by wiping state — projections persist
       independently and mask staleness (the "green-but-stale" trap).
@@ -210,17 +211,17 @@ by an id, not just in-app state.
 ### G. Deliberate duplication (bundler/runtime constraints)
 - [ ] Logic that must run in more than one entrypoint but CANNOT be shared (bundler ships only the
       entrypoint; no module sharing) must be **inline-duplicated**. Add a **KEEP-IN-SYNC** banner at
-      each copy + a **parity test**, and register it in the guards registry (`SKILL.md` in this folder).
+      each copy + a **differential test**, and register it in the guards registry (`SKILL.md` in this folder).
 
 ### H. Third-party APIs
 - [ ] **Verify the external system's LIMITS empirically before designing around them** — a
-      one-question probe script against the real API beats documentation (a probe once found a hard
+      one-question learning test against the real API beats documentation (one once found a hard
       input-size cap nothing in the docs mentioned).
 - [ ] **Inject the transport/io at the boundary** (an adapter the caller supplies) — the module then
-      tests with fakes, probes with local fetch, and ships dormant regardless of the runtime's HTTP
+      tests with fakes, runs learning tests with local fetch, and ships unwired regardless of the runtime's HTTP
       libs; ownership of either side can change without a rewrite.
-- [ ] **Verification tiers: fake it (unit) → probe it (live one-question scripts) → integrate
-      (gated).** The middle tier is the one people forget — and the one that finds the vendor's
+- [ ] **Verification tiers: fake it (unit test) → learning test (live one-question scripts) →
+      integration test (gated).** The middle tier is the one people forget — and the one that finds the vendor's
       real behavior.
 - [ ] **Secrets:** API keys server-side ONLY — never in the repo, a client file, or the browser.
       Design the not-configured path (missing secret ⇒ fail-open with a reason, zero network calls).

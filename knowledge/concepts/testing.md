@@ -1,6 +1,6 @@
 # Testing
 
-> **Covers:** How behavior is verified: the kinds of tests, the house test types, and the ladder for adopting heavier tooling one rung at a time.
+> **Covers:** How behavior is verified: the kinds of tests, the regression tests this kit labels by intent, and the ladder for adopting heavier tooling one rung at a time.
 
 ## Terms
 
@@ -11,9 +11,15 @@
   logic, or it only checks what its mocks were told to return — an anti-pattern
 - **test behavior, not implementation** — assert what code does for its caller, not how it does it;
   a good test fails when behavior breaks and survives a refactor
-- 🏠 **pin** (≈ characterization / regression test freezing a decided behavior) · 🏠 **tripwire** (≈
-  canary test designed to redden on a planned event) · 🏠 **drift guard / parity test** (≈
-  consistency check between deliberate copies)
+- **characterization test** — freezes what existing code does TODAY, bugs included, so you can
+  refactor it safely (Michael Feathers, *Working Effectively with Legacy Code*). Not the same as a
+  regression test, which protects behavior you DECIDED on
+- **differential test** — runs two implementations of the same logic on the same inputs and
+  compares the results, e.g. a client and a server validator sharing one table of test cases
+  (formerly "drift guard" / "parity test" in this kit)
+- **expected-failure test** — a test marked as expected to fail, so the suite turns red the day it
+  starts passing (pytest `xfail(strict=True)`, Vitest `test.fails`); used to detect a planned
+  event (formerly "tripwire" in this kit)
 
 ## Conventional kinds (industry-standard vocabulary)
 
@@ -24,9 +30,11 @@
 | **End-to-end (E2E)** | The real app, driven like a user, minutes | The whole system works for a real flow | Playwright, Cypress |
 | **Smoke** | A handful of E2E-ish checks after a deploy | The deploy didn't brick the core paths | A tagged subset of E2E |
 | **Regression** | Any tier | A previously-fixed bug stays fixed; a decided behavior stays decided | Ordinary behavior tests — added or strengthened when a bug reveals an untested behavior |
-| **Acceptance / UAT** | Human or automated, against requirements | The feature does what the stakeholder asked | Manual scripts with must-pass checklists; BDD |
+| **Acceptance / UAT** | Human or automated, against requirements | The feature does what the stakeholder asked | Manual scripts with acceptance-criteria checklists; BDD |
 | **BDD / Gherkin** | Requirements as executable `Given/When/Then` | The spec itself is testable — no reinterpretation gap | Cucumber, SpecFlow |
 | **Contract** | The boundary between two systems | Each side honors the agreed request/response shapes | Pact; fixture-replay tests |
+| **Golden master / snapshot / approval** | Any tier, replaying a real captured input | The output for a real captured payload is still exactly the same | Vitest/Jest snapshots, ApprovalTests; record-replay tools |
+| **Characterization** | Usually unit, around legacy code | What the code does TODAY is recorded before you refactor it | Ordinary runners; often snapshot-style |
 | **Property-based** | Unit tier, generated inputs | Invariants hold for HUNDREDS of random inputs, not 5 hand-picked ones | fast-check, Hypothesis |
 | **Mutation** | Meta — tests the tests | Each deliberate code-break is caught by some test (survivors = weak tests) | Stryker, mutmut |
 | **Performance / load** | System under traffic | Latency/throughput budgets hold | k6, Locust |
@@ -40,22 +48,22 @@ retried forever.
 
 | Kind | What it proves | When to write one |
 |---|---|---|
-| **Pin** | A decided behavior/value hasn't drifted | Any invariant a plan says is "enforced by convention" |
-| **Drift / parity guard** | Two deliberate copies of logic are still identical | Every guards-registry entry with >1 copy |
-| **Tripwire** | A planned external event fired (red = working) | Any dormant activation or go-live flip worth detecting |
-| **Inertness pin** | Dormant/data-gated code changed nothing live | Every DATA-GATED INERT edit |
-| **Replay / golden-master** | The real engine still handles a real captured payload identically | External contracts; after the first real payload exists |
+| **Regression test for a decision** | A decided behavior/value hasn't drifted | Any invariant a plan says is "enforced by convention" |
+| **Differential test** | Two deliberate copies of logic still agree | Every guards-registry entry with >1 copy |
+| **Expected-failure test** | A planned external event happened (red = working) | Any unwired activation or go-live flip worth detecting |
+| **Flag-off regression test** | Dark-launched (data-gated) code changed nothing live | Every dark-launch edit |
+| **Golden master** | The real engine still handles a real captured payload identically | External contracts; after the first real payload exists |
 
 ## The growth ladder — adopt deliberately, one rung at a time
 
 Each rung multiplies the value of the rungs below it. Adopt a rung when its trigger appears, not
 before — premature tooling is maintenance debt.
 
-1. **A solid hermetic unit suite + taxonomy README** — the foundation; everything else assumes it.
-1.5. **The static gate** — *trigger: any codebase layer your tests read as text rather than
+1. **A solid hermetic unit suite + test strategy README** — the foundation; everything else assumes it.
+1.5. **The lint check** — *trigger: any codebase layer your tests read as text rather than
    execute (JSX, templates, untyped scripts), and no CI yet.* Cheap, closes a whole signal-less
    class; for solo/agentic projects it arrives long BEFORE rung 7 (where lint conventionally
-   lives, inside CI). Recipe in the `write-tests` skill § "The static gate".
+   lives, inside CI). Recipe in the `write-tests` skill § "The lint check".
 2. **Coverage reporting** (`--coverage`) — *trigger: you're unsure which branches are untested.*
    Read it as a map of gaps; never set a threshold target without understanding Goodhart's law.
 3. **Property-based tests** — *trigger: a function's input space is large (parsers, date math,

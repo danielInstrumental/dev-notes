@@ -13,7 +13,7 @@
 - **cross-cutting change** — one change spread across many places or a shared convention; the risk
   is missing one (vs a **surgical/localized** fix: one site, one rule)
 - **blast radius** — how much can break if a change is wrong
-- **regression surface** — which existing behaviors need re-verification after a change; near a
+- **regression scope** — which existing behaviors need re-verification after a change; near a
   deadline you ration THIS, not lines of code
 - **reachability** — the estimator for both of the above: who/what can execute the changed code?
   A 10-line refactor of a shared helper can outweigh a 100-line additive feature
@@ -21,12 +21,12 @@
   when chosen consciously)
 - **drift** — duplicated things (rules, copies, docs) falling out of sync silently
   → [[#Drift]]
-- 🏠 **reference trace** (≈ impact analysis / "find all references") — find everything that uses a
-  symbol before changing or removing it → [[#Reference trace]]
+- **impact analysis / find all references** — find everything that uses a symbol before changing
+  or removing it (formerly "reference trace" in this kit) → [[#Impact analysis]]
 - **orphaned reference** — a reference to something that no longer exists (also: dangling reference)
-  → [[#Reference trace]]
-- **dead code** — code that can never run, or whose result is never used → [[#Reference trace]]
-- **false positive** — a result that looks like a match but isn't → [[#Reference trace]]
+  → [[#Impact analysis]]
+- **dead code** — code that can never run, or whose result is never used → [[#Impact analysis]]
+- **false positive** — a result that looks like a match but isn't → [[#Impact analysis]]
 - **migration** — moving data/code from an old shape to a new one
 - **backward compatibility** — new code still handles old data/behavior
 
@@ -43,13 +43,13 @@ When two copies of something that **must** agree are maintained separately, they
 - When duplication is unavoidable, treat the copies as a **set** and change them **together**.
 - Test *both* paths — a value that should fail must fail at *every* gate. Passing one but not another = drift.
 
-## Reference trace ("find all references")
+## Impact analysis ("find all references")
 
-Finding **every** place that reads or depends on a symbol (a field, variable, function, prop) **before** you change or remove it. It's the discovery step: you can't reason about the impact of touching `X` until you've located all of `X`'s consumers. Same idea as an IDE's "Find all references," done deliberately. *House term* — the standard name for the wider practice is **impact analysis**.
+Finding **every** place that reads or depends on a symbol (a field, variable, function, prop) **before** you change or remove it. It's the discovery step: you can't reason about the impact of touching `X` until you've located all of `X`'s consumers. Same idea as an IDE's "Find all references," done deliberately and across every layer.
 
 **When:** mandatory before any **destructive change** (removing/renaming); recommended before changing a value's type or shape. Additive changes need a lighter trace.
 
 Terms that go with it:
-- **Orphaned (dangling) reference** — code still pointing at a symbol that no longer exists after a removal. The bug a reference trace prevents.
+- **Orphaned (dangling) reference** — code still pointing at a symbol that no longer exists after a removal. The bug impact analysis prevents.
 - **Dead code** — code that can never run, or whose result is never used. A removal often leaves some behind (a branch or handler that can no longer fire); clean it in the same pass.
-- **False positive** (false match) — a search hit that *looks* related but isn't. A trace must disambiguate, not just count hits.
+- **False positive** (false match) — a search hit that *looks* related but isn't. The analysis must disambiguate, not just count hits.

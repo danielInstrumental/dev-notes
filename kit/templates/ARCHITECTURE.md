@@ -43,7 +43,7 @@ graph LR
 yourself re-explaining one here, stop — link it instead.>
 
 - **<Pattern name>** — <one line> → see <file / guards registry row>
-- **<Invariant>** — <one line, incl. what ENFORCES it (construction / test pin / convention)> → <pointer>
+- **<Invariant>** — <one line, incl. what ENFORCES it (construction / regression test / convention)> → <pointer>
 
 ## 4. Core data flow — the tracer-bullet path, drawn
 

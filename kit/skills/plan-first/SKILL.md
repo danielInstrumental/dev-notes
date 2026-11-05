@@ -1,6 +1,6 @@
 ---
 name: plan-first
-description: Plan-first workflow for any code change — ground the plan in current code, trace every consumer, build the dependency impact model, and wait for an explicit "go" before implementing. Use before ANY code change.
+description: Plan-first workflow for any code change — ground the plan in current code, find every consumer and writer, run the change impact analysis, and wait for an explicit "go" before implementing. Use before ANY code change.
 ---
 
 # Plan First (plan before implementing)
@@ -15,7 +15,7 @@ description: Plan-first workflow for any code change — ground the plan in curr
 ## Purpose
 
 Produce a grounded, decision-complete plan before any code is written. No code until a grounded
-plan exists, the dependency impact model is built, decisions are confirmed, and the user gives an
+plan exists, the change impact analysis is done, decisions are confirmed, and the user gives an
 explicit "go".
 
 ## When to use
@@ -31,13 +31,13 @@ asks for a plan, follow every phase below, in order.
 1. **NO CODE before an approved plan + explicit "go".** Understanding a pattern is not approval.
    Discussing a fix is not approval. A plan existing is not approval.
 2. **Respect the deploy/verify boundary** (configuration block above).
-3. **One unit of change per verify cadence.** Propose → user confirms → implement ONE unit → user
+3. **Small batches — one unit of change at a time.** Propose → user confirms → implement ONE unit → user
    verifies → only then propose the next. Never batch ahead, never "while I'm here".
 4. **Log to the implementation log only AFTER the user verifies.** Never before. Don't edit the
    frozen PRIOR handoff mid-session.
 5. **Out-of-scope findings go to the bug log** as new numbered entries — never folded into the
    current change's scope.
-6. **Stop on surprise.** If implementation or verification reveals ANYTHING the impact model did not
+6. **Stop the line on any surprise.** If implementation or verification reveals ANYTHING the impact analysis did not
    predict — an extra consumer, an unconditional code path, a different data type — STOP, report it,
    and wait. Do not improvise a fix for the surprise inside the approved scope.
 
@@ -59,7 +59,7 @@ A plan is grounded only when every claim in it was verified against the code as 
   internal name AND the type before declaring it wireable. (Lesson: two fields were mis-wired because
   a keyword guess matched the wrong property; the display label was the reliable key.)
 - **Pattern reuse never skips grounding.** "Same fix as #X" speeds the design, but the new surface
-  gets its own full Phase 0–2 pass. (Lesson: a "copy of a previous fix" got its own impact model,
+  gets its own full Phase 0–2 pass. (Lesson: a "copy of a previous fix" got its own impact analysis,
   which found an unconditional code path the pattern-copy alone would have missed.)
 - **"Verify at edit time" is self-confessed incomplete grounding.** Grep your own plan for "verify
   at edit/implement time" before presenting — each instance is Phase-0 debt, and closing them finds
@@ -67,7 +67,7 @@ A plan is grounded only when every claim in it was verified against the code as 
 
 ---
 
-## Phase 1 — Reference trace
+## Phase 1 — Find all references (consumers and writers)
 
 Sweep the codebase for **every consumer and writer** of the thing being changed. Present as a table:
 
@@ -76,16 +76,16 @@ Sweep the codebase for **every consumer and writer** of the thing being changed.
 - Grep for the state key, the function, the event name, the CSS class, the prop — every handle on it.
 - Include every layer: components, central orchestrators, server/API functions, event listeners,
   summary/display views, styles — and any standalone surfaces that carry their own copies of patterns.
-- **Tests are consumers too:** include the pins/guards that constrain the thing being changed. A
-  trace that omits them under-predicts the co-edits — this row feeds the Phase-4 predicted-test-impact
+- **Tests are consumers too:** include the regression and differential tests that constrain the
+  thing being changed. A search that omits them under-predicts the co-edits — this row feeds the Phase-4 predicted-test-impact
   section.
-- The trace must find the consumers the bug entry **didn't know about** — that's its job.
+- The search must find the consumers the bug entry **didn't know about** — that's its job.
 
 ---
 
-## Phase 2 — Dependency impact model (checklist §§1–5)
+## Phase 2 — Change impact analysis (checklist §§1–5)
 
-Build the model BEFORE designing the edit. Walk the companion checklist §§1–5 explicitly and write
+Do the analysis BEFORE designing the edit. Walk the companion checklist §§1–5 explicitly and write
 the walk down:
 
 - **§1 Unit of change** — UI field / state key / validation rule / workflow logic / persistence shape.
@@ -107,8 +107,8 @@ the walk down:
      Both postures are valid — *unexamined* is not.
   3. **What invariants must hold after the change?** Name them. An invariant the plan doesn't name
      is an invariant the implementation can break silently. **And state what ENFORCES each
-     invariant / "no-impact" claim:** *by construction* (structural — cannot regress), *by test pin*,
-     or *by convention*. Convention-enforced claims MUST gain a pin or a KEEP-IN-SYNC marker —
+     invariant / "no-impact" claim:** *by construction* (structural — cannot regress), *by regression test*,
+     or *by convention*. Convention-enforced claims MUST gain a regression test or a KEEP-IN-SYNC comment —
      decisions regress when forgotten; constructions don't.
 - **Lifecycle & entry-point sweep** — §2 covers downstream *readers*; THIS covers the *inbound*
   pathways that POPULATE the touched state and the re-derivation paths (the recurring blind spot,
@@ -116,25 +116,25 @@ the walk down:
   Enumerate the project's FIXED set of these once, then walk each, marking **applies / N/A**:
   fresh entry (every surface that can create the record) · server-side seeding/prefill · inbound
   integrations/ingest · re-validation (load-time healing + navigate-away) · post-submit/locked
-  state · outbound projection/sync (including the empty/zero case) · display/summary · **load-time
-  AUTO-WRITERS** (effects that write state on page open with NO user action — they meet
+  state · outbound projection/sync (including the empty/zero case) · display/summary · **on-load
+  side effects** (effects that write state on page open with NO user action — they meet
   server-injected state BEFORE any user edit and amplify multi-tab races).
   **Plus the FUTURE-writer question:** the sweep audits TODAY's writers — if the change alters a
   state key's shape or semantics, name the shape/invariant a *future* writer must honor as an
-  explicit invariant in the plan (normalize-on-read protects readers only).
-- **Review-dimensions sweep** (one line each — call out the ones that APPLY, mark the rest N/A so
-  nothing is silently skipped): **regression surface** · **implicit contracts** (unenforced
+  explicit invariant in the plan (a tolerant reader protects readers only).
+- **Quality-attributes checklist** (one line each — call out the ones that APPLY, mark the rest N/A so
+  nothing is silently skipped): **regression scope** · **implicit contracts** (unenforced
   assumptions: shapes, ordering, semantics) · **idempotency** (is running it twice safe) ·
   **security/authorization** (server-enforced or UI-only? data exposure?) · **observability** (when
   it fails, will anyone KNOW?) · **performance** (added reads/calls/renders per operation) ·
-  **accessibility** (labels, focus, announcements) · **validator drift** (does this ADD, CHANGE, or
+  **accessibility** (labels, focus, announcements) · **rule duplication / drift** (does this ADD, CHANGE, or
   DUPLICATE a rule enforced in more than one place? If so: update ALL copies as a SET, or consciously
   accept the duplication WITH a keep-in-sync mechanism — a prominent "KEEP IN SYNC with X" comment at
   each copy. Name the copies and the sync plan. This is the #1 recurring bug class. ⚠️ **Direction
   matters:** a *destructive* change (remove/rename a requirement) not mirrored to the server makes
   the server STRICTER than the client → false rejection of valid users (HIGH severity); an *additive*
-  change not mirrored makes the server looser → the backstop silently weakens.)
-- **Interaction crossings** (checklists don't catch these): for feature-shaped units, walk **every
+  change not mirrored makes the server looser → the server-side validation silently weakens.)
+- **State transition testing** (checklists don't catch these): for feature-shaped units, walk **every
   state's exits**, cross **each user action with each state transition** (e.g. dismissing a
   processing banner must not suppress the later ready notification), and ask **"what does success
   disable / what does failure retry?"** (a "once" marker must mean once *successfully*).
@@ -154,7 +154,7 @@ say so explicitly, never skip silently.
 
 **The check — establish with RECEIPTS whether the thing exists on purpose. Four sources:**
 project registers / decision docs · plan + implementation history · comments at the site (see
-comment-protocol: fingerprints are this check's SUPPLY SIDE — a fingerprint means decision,
+comment-protocol: why-comments are this check's SUPPLY SIDE — a why-comment means decision,
 silence means presumed rot) · `git log -S` / blame for the birth commit.
 
 **Record ONE verdict in the plan:**
@@ -179,26 +179,27 @@ the scream test — measurement substitutes for missing documentation.
 - Note precedent patterns being reused and where they live — with the load-bearing details included
   (the detail you omit is the one that bites).
 - **Classify every edit by SHIPPING MODE** — each mode has its own proof obligation:
-  - **DORMANT**: new code that nothing imports/registers — ships inert with no way to run.
-    Proof = a dormancy check (exists / not registered / not required by any entrypoint).
-  - **DATA-GATED INERT**: an edit to live code whose new branch is unreachable until an external
-    precondition exists. Proof = (i) a check that the gating value is absent from all production
-    data, (ii) an **inertness pin** (existing behavior byte-identical against current fixtures),
-    (iii) copy-parity where applicable. The gate is DATA, not a config flag — nothing to toggle off.
+  - **UNWIRED**: new code that nothing imports/registers — ships inert with no way to run.
+    Proof = a check that it exists but is not registered / not required by any entrypoint.
+  - **DARK LAUNCH (data-gated)**: an edit to live code whose new branch is unreachable until an
+    external precondition exists. Proof = (i) a check that the gating value is absent from all
+    production data, (ii) a **flag-off regression test** (existing behavior byte-identical against
+    current fixtures), (iii) a differential test where applicable. The gate is DATA, not a config
+    flag — nothing to toggle off.
   - **LIVE**: behavior changes now — full verification depth.
   Don't mix LIVE with the other modes in one unit unless inseparable.
 - **When a plan ADDS a protective guard, re-walk every existing path that previously DELETED or
   OVERWROTE the newly-protected thing** — each such path's outcome silently changes and must become
   a NAMED DECISION, not an accident.
-- **Multi-writer fields need a stated PRECEDENCE CHAIN.** When a change adds a writer to any state
-  slot, state the full chain (e.g. user-typed > seeded > ingested), name the merge policy implementing
+- **Multi-writer fields need a stated SOURCE-PRECEDENCE policy** (conflict resolution). When a
+  change adds a writer to any state slot, state the full order (e.g. user-typed > seeded > ingested), name the merge policy implementing
   it (e.g. fill-only-empty), and confirm the ordering guarantee that makes any arrival order converge.
   Distinguish **safe-by-exclusion** (never mapped at all — stronger) from **safe-by-precedence**
   (mapped, resolved by merge order); say which one each contested field relies on.
 - **EVIDENCE TIERS for load-bearing numbers.** Classify every constant the design leans on:
   **measured** (we watched it) → **documented-verified** (read in the vendor's live docs during this
   project, cite the URL) → **documented-remembered** (model/training knowledge) → **inferred**.
-  State each number's tier; retiring a verification probe requires UPGRADING the tier, never
+  State each number's tier; retiring a learning test requires UPGRADING the tier, never
   trusting it.
 - **Tiered designs answer "which tier is the user's concrete case?" IN THE PLAN.** Every threshold
   word (oversize, large, slow) gets its number, its UNIT, and which pipeline leg it governs — and the
@@ -220,30 +221,30 @@ Two halves, both planned up front:
   cases (nothing changed → nothing written). Report as N/N passed with the case list.
 - **PREDICTED TEST IMPACT — required for any change touching suite-covered code, written BEFORE
   implementing.** Four lists: **(a) tests that MUST redden** — an expected red is PROOF the edit
-  landed, not a failure · **(b) tests that MUST stay green** — the inertness/regression pins ·
+  landed, not a failure · **(b) tests that MUST stay green** — the flag-off and regression tests ·
   **(c) new tests needed** — including helper/fake extensions · **(d) tests whose NAMES/comments
   become intent-divergent** — still green but now describing the old behavior; rename WITH the
   change, never leave a green lie.
 - Grep-verify every edit landed; run the project's syntax/diagnostic checks.
-- **When the unit touches an EXTERNAL system, add the middle verification tier — fake it (unit) /
-  probe it (live one-question scripts, redacted data only) / integrate (gated).** The middle tier is
-  the one people forget — and the one that finds the vendor's real behavior (a live probe once found
-  a hard document-size cap no documentation mentioned).
+- **When the unit touches an EXTERNAL system, add the middle verification tier — fake it (unit
+  test) / **learning test** (live one-question scripts, redacted data only) / integration test
+  (gated).** The middle tier is the one people forget — and the one that finds the vendor's real
+  behavior (a learning test once found a hard document-size cap no documentation mentioned).
 - **When the unit produces a CONTRACT/spec with examples, machine-verify the examples through the
   real engine** — a spec example that parses through the real code cannot drift from the implementation.
-- **A constraint can only be MEASURED from inside the environment that imposes it.** A probe that
+- **A constraint can only be MEASURED from inside the environment that imposes it.** A learning test that
   succeeds from the local machine proves the CONTRACT (wire shape, acceptance), never the RUNTIME
-  ENVELOPE (execution ceilings, memory). State per probe result which of the two it proved.
-- **Manufactured test artifacts are themselves a variable.** A probe failure may be the artifact,
-  not the system (a programmatically-rebuilt file failed a pipeline the native equivalent passed).
-  Prefer native/real artifacts; when a manufactured one fails, re-test with a differently-made one
+  ENVELOPE (execution ceilings, memory). State per result which of the two it proved.
+- **Synthetic test artifacts are themselves a variable.** A failure may be the artifact, not the
+  system (a programmatically-rebuilt file failed a pipeline the native equivalent passed).
+  Prefer native/real artifacts; when a synthetic one fails, re-test with a differently-made one
   BEFORE concluding anything about the system.
 
 **Post-deploy (user, in the real environment):**
 - Written as **observable evidence**, not vague "check it works": which UI element, which network
   request (or its absence), which stored value, which error message verbatim.
 - Include a **regression pass** (the unchanged paths still behave identically) and mark the
-  **must-pass set** — the 2–3 checks that decide done/not-done.
+  **acceptance criteria** — the 2–3 checks that decide done/not-done.
 - Ask the user to report observations in the gold-standard format:
   `1: <what they saw> ✓ · 2: <what they saw> ✓` — observed values, not just "confirmed".
 
@@ -257,21 +258,21 @@ Two halves, both planned up front:
 - **Wait for the explicit go.** Answers to decisions ≠ go. Ask if ambiguous.
 - **The moment approval is given, record it in the plan-log entry** (flip to `🟢 APPROVED <date> —
   user confirmed <which decisions>`), so an interruption can't lose the approval state.
-- **The PRE-GO RE-REVIEW is a standing offer.** For any unit beyond trivial, a full Phase 0–2 re-walk
-  against the real code immediately before the go is cheap and has never come back empty. For DORMANT
+- **A PRE-IMPLEMENTATION REVIEW is a standing offer.** For any unit beyond trivial, a full Phase 0–2 re-walk
+  against the real code immediately before the go is cheap and has never come back empty. For UNWIRED
   builds it finds mostly *integration-boundary and go-live issues*, not module bugs.
-- **Name the plan's STAGE at the top — proposal-grade vs build-grade are different documents with
-  different completion bars.** A PROPOSAL/ADR plan (is this worth doing?) is complete when every open
-  item is *named and gated* — it deliberately stops short of numbered edits. A BUILD plan is complete
-  when every edit is numbered and grounded. A proposal → build transition is a second planning pass,
-  not a formality.
+- **Name the plan's STAGE at the top — a design doc (RFC) and an implementation plan are different
+  documents with different completion bars.** A DESIGN DOC / RFC / ADR (is this worth doing?) is
+  complete when every open item is *named and gated* — it deliberately stops short of numbered
+  edits. An IMPLEMENTATION PLAN is complete when every edit is numbered and grounded. Going from
+  design doc to implementation plan is a second planning pass, not a formality.
 
 ---
 
 ## Phase 6 — Implementation rules
 
 - Implement exactly the numbered edits — nothing more. Read each edit site immediately before editing.
-- Stop-on-surprise (standing rule 6) applies from the first keystroke.
+- Stop the line (standing rule 6) applies from the first keystroke.
 - After editing: run the Phase 4 pre-handoff checks (unit tests, grep verification, diagnostics).
 - Then hand to the user for deploy with the post-deploy verification list restated. Do not log
   anything yet.
@@ -285,7 +286,7 @@ Two halves, both planned up front:
 ## Phase 7 — Post-implementation verification (against the model)
 
 After implementing (and after the user verifies), verify the implementation **against the impact
-model built in Phase 2** — not against memory:
+analysis from Phase 2** — not against memory:
 
 > Confirm behavior matches across all validation scopes, the persistence schema, the write path,
 > downstream consumers, and the render layer.
@@ -300,7 +301,7 @@ Walk the checklist's §6 verification surfaces and report which apply and what w
 1. **`IMPLEMENTATION_LOG.md`** — append the as-built entry at EOF (see the
    `log-implementation` skill).
 2. **`PLAN_LOG.md`** — flip the entry's status to `✅ RESOLVED <date>`, noting whether the impact
-   model held and any deviations.
+   analysis held and any deviations.
 3. **Bug log** — mark the entry `✅ RESOLVED <date>` in the heading + add a resolution block at the
    top of the entry (preserve the original text below). File any spawned findings as NEW numbered
    entries. The bug log is only for real deferred bugs/future work — approved decisions and completed
@@ -317,7 +318,7 @@ Walk the checklist's §6 verification surfaces and report which apply and what w
 
 A **guard** = a server-enforced check that gates an action (the authoritative line; any client
 equivalent is UX-only, defense-in-depth). A **duplicated rule** = the same logic in more than one
-place (validator-drift risk). When a plan touches a field, rule, state key, or status that ANY entry
+place (drift risk). When a plan touches a field, rule, state key, or status that ANY entry
 below depends on, the plan MUST update that guard/copy too — or note explicitly why it's unaffected.
 **Keep this table current as guards land — starts empty in a new project.**
 
@@ -325,8 +326,8 @@ below depends on, the plan MUST update that guard/copy too — or note explicitl
 |---|---|---|---|
 | _(none yet — add the first row when the first guard or deliberate duplication ships)_ | | | |
 
-(This registry is the concrete companion to the Phase-2 **validator drift** + **§6 invariants**
-checks: validator-drift asks "did I sync the copies?", the registry says "here are the copies/guards
+(This registry is the concrete companion to the Phase-2 **rule duplication** + **§6 invariants**
+checks: the duplication check asks "did I sync the copies?", the registry says "here are the copies/guards
 that exist.")
 
 ---
@@ -341,15 +342,15 @@ Every phase always runs — only the **depth** scales:
   real issues on "display-only" units — accessibility gaps especially.)
 - **Heavy** (multi-layer/multi-file): full HIGH-LEVEL SUMMARY up top ("read this"), exhaustive trace,
   per-edit lettering across files, server + client halves separated (Part A / Part B), and a
-  verification plan with a numbered must-pass scenario list.
+  verification plan with a numbered list of acceptance criteria.
 
-### Pre-building under an undecided fork (deadline readiness)
+### Building before a decision lands (defer to the last responsible moment)
 
 When you must build before an external decision lands: (a) write the CONTRACT first — it is the fixed
 point every branch shares. (b) put an injected SEAM at every boundary whose owner is undecided
-(io adapter / transport / driver hook) — the pivot then swaps a module, not a design. (c) ship
-dormant only what is truly inert; UI can ship behind a **dev toggle** (URL-param pattern) with manual
-verify. (d) track every assumption with its pivot path, and mark every deferral with WHAT it gates:
+(ports and adapters: io adapter / transport / driver hook) — the pivot then swaps a module, not a
+design. (c) ship unwired only what is truly inert; UI can ship behind a **feature flag** (e.g. a
+URL param) with manual verify. (d) track every assumption with its pivot path, and mark every deferral with WHAT it gates:
 *building*, *finalizing*, or *activating*. (e) judge insurance code by OPTION VALUE (test-tooling,
 audit capability, pivot speed), not by whether it runs in production.
 
@@ -364,7 +365,7 @@ audit capability, pivot speed), not by whether it runs in production.
 
 <What's wrong, the proven cause, the fix in one sentence, severity, blast radius.>
 
-### Reference trace (verified in code today)
+### Find all references (verified in code today)
 | Consumer / writer | Where | Today | After the fix |
 
 ### Checklist walk (§§1–5 + plan-level §6)
@@ -375,19 +376,19 @@ audit capability, pivot speed), not by whether it runs in production.
 - §5 Schema/contracts: …
 - §6 Failure modes & invariants: runtime failures / partial failure / races · guard posture
   (fail-open/closed) · named invariants + what enforces each
-- Review-dimensions sweep: regression surface · implicit contracts · idempotency · security/authz ·
-  observability · performance · a11y · validator drift — applies / N/A each
+- Quality-attributes checklist: regression scope · implicit contracts · idempotency · security/authz ·
+  observability · performance · a11y · rule duplication — applies / N/A each
 - Lifecycle & entry-point sweep: <the project's enumerated inbound/re-derivation paths> —
   applies / N/A each
 
 ### Design (numbered edits)
 - A1 / A2 / B1 …: file + insertion point + code
-- Shipping mode per edit: DORMANT / DATA-GATED INERT / LIVE + its proof obligation
+- Shipping mode per edit: UNWIRED / DARK LAUNCH (data-gated) / LIVE + its proof obligation
 
 ### Verification
 - Pre-handoff: unit tests (cases) + grep/diagnostics
 - Predicted test impact: (a) must-redden · (b) must-stay-green · (c) new tests · (d) intent-divergent renames
-- Post-deploy (user): numbered observable checks + must-pass set
+- Post-deploy (user): numbered observable checks + acceptance criteria
 
 ### Decisions to confirm
 - (1) … [rec — why] vs alternative

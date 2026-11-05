@@ -38,7 +38,7 @@ docs rather than duplicating their contents — duplicated content is how router
    and open items. **Then follow that handoff's own required-reading list** — it's kept current each
    session and supersedes the static list here.
 2. **The `plan-first` skill** (`SKILL.md` + `change-impact-checklist.md` in its folder) — the
-   plan-first workflow (Phases 0–8) and the dependency-impact checklist.
+   plan-first workflow (Phases 0–8) and the change impact checklist.
 3. **The bug log** — the numbered log of open + resolved issues.
 4. **`.ai/IMPLEMENTATION_LOG.md`** — append-only as-built history (newest at EOF). Past entries explain
    *why* things are the way they are.
@@ -53,17 +53,17 @@ docs rather than duplicating their contents — duplicated content is how router
 2. **No application code without an approved plan + an explicit "go".** Understanding a pattern,
    discussing a fix, or a plan merely existing is NOT approval. (Docs/log edits are exempt — they're
    not application code.)
-3. **One unit of change per verify cadence.** Propose → confirm → implement ONE unit → user verifies →
+3. **Small batches — one unit of change at a time.** Propose → confirm → implement ONE unit → user verifies →
    only then the next. Never batch ahead, never "while I'm here".
 4. **Log to `IMPLEMENTATION_LOG.md` only AFTER the user verifies** the change in the real environment.
    Never before.
 5. **Out-of-scope findings → a new numbered entry in the bug log**, never folded into the current change.
-6. **Stop on surprise.** If reality contradicts the plan's impact model, stop and report — don't improvise.
+6. **Stop the line on any surprise.** If reality contradicts the plan's impact analysis, stop and report — don't improvise.
 7. **Ground against the code, not the notes.** Bug entries and old plans rot; verify line numbers and
    behavior in the actual files before acting on them.
 8. **Duplicated logic is edited as a SET.** Where the same rule/function deliberately exists in more
    than one place (see the Guards & duplicated-rule registry in the `plan-first` skill), edit every
-   copy and run whatever parity check pins them together.
+   copy and run the differential test that keeps them in agreement.
 9. **Prompt-coaching note every turn.** Every response — answers and implementations alike — ends
    with the coaching note per the `prompt-coaching` skill.
 
@@ -92,8 +92,9 @@ docs rather than duplicating their contents — duplicated content is how router
   snapshot, commands), then the specific plan. Don't reconstruct initiative context from the
   handoff alone.
 - **If the test suite is RED at startup, identify the failing test's KIND before touching anything.**
-  Some tests are pins/tripwires DESIGNED to fail on planned events — a red tripwire is the signal
-  working, and "fixing" it to green destroys the guard. Never delete-to-green.
+  Some tests (regression tests for decisions, expected-failure tests) are DESIGNED to fail on
+  planned events — a red expected-failure test is the signal working, and "fixing" it to green
+  destroys the guard. Never delete-to-green.
 - **For a LARGE new workstream (not routine pick-up):** a parallel fan-out read is an available
   grounding pattern — several read-only explorer agents over the layers (server / front-end / tests /
   docs), each returning a dense map, cross-checked against each other. Spot-verify any load-bearing

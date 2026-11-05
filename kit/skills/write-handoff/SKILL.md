@@ -45,7 +45,7 @@ key names, and identifiers; a handoff full of vague nouns ("the degree stuff") i
    - a **deploy state** line: **git merge ≠ deployed.** Code can be merged to main yet NOT live.
      State both explicitly ("merged AND live as build #N", or flag the gap: "merged but NOT deployed").
      There is a third gradation: **logic-verified-via-script ≠ deployed** — proving logic against the
-     live system with a standalone probe still leaves the deployed code running the old version. A
+     live system with a standalone learning test still leaves the deployed code running the old version. A
      feature can be code-complete + logic-verified + NOT deployed + NOT user-verified — name which
      state each item is in and the exact remaining step.
    - If the session shipped no code: say **"NO CODE SHIPPED — <docs / triage / planning> session"**
@@ -62,7 +62,7 @@ key names, and identifiers; a handoff full of vague nouns ("the degree stuff") i
    verify, and any blocked items with the blocker. Include:
    - **The INPUTS the user owes the next session** — some pick-ups are gated on decisions/answers
      only the user can bring; name each needed input explicitly.
-   - **Cascade/unmasked bugs and their SEQUENCING** — when fixing X surfaced a deeper pre-existing
+   - **Masked defects and their SEQUENCING** — when fixing X surfaced a deeper pre-existing
      bug Y that was masked until the fix: record both, note *why* Y was hidden, and state whether
      continuing X is **gated behind Y**. Say "blocked behind newly-found #Y," not just "deferred."
 
@@ -83,11 +83,11 @@ key names, and identifiers; a handoff full of vague nouns ("the degree stuff") i
    - **If a deploy is BLOCKED by INFRA (not by our code):** record the block's identity (exact
      endpoint), what was ruled out client-side, the support reference, and who owns the workaround —
      a blocked-but-correct feature is its own state; the next agent must not re-debug working code.
-   - **No unglossed jargon or metaphors — define terms inline at first use.** Write "the probe
-     (= a throwaway script that asks the real system one question)" the first time, every session.
+   - **No unglossed jargon or metaphors — define terms inline at first use.** Write "the learning test
+     (= a small script that asks the real system one question)" the first time, every session.
      A metaphor that carried a decision must be expanded to the literal decision.
 
-7. **Mental-model pins** — the hard-won conceptual distinctions, numbered, phrased as **"do not
+7. **Key distinctions** — the hard-won conceptual distinctions, numbered, phrased as **"do not
    conflate X with Y."** The gist survives compaction; the DISTINCTIONS don't — these are the
    highest-value lines in a handoff for a weaker reader.
 
@@ -104,11 +104,11 @@ key names, and identifiers; a handoff full of vague nouns ("the degree stuff") i
 
 10. **Methodology rules + DO-NOT list** — how the user wants the agent to work, and the prohibitions
     **enumerated, not implied** (strong models infer prohibitions from context; weaker ones need the
-    list): never deploy · never touch X · never commit secret Y · never delete-to-green a pin/tripwire
-    (name any NEW pins this session added and their flip conditions).
+    list): never deploy · never touch X · never commit secret Y · never delete-to-green a decision regression test or
+    expected-failure test (name any NEW ones this session added and their flip conditions).
 
 11. **Cleanup debt** — temporary instrumentation/scaffolding owed removal: diagnostic logs, test
-    records created in external systems, feature-flag stubs, commented-out probes — each with its
+    records created in external systems, feature-flag stubs, commented-out spike code — each with its
     **removal condition**. Temporary code that isn't written down as owed becomes permanent silently.
     (A live-verification script in a scratchpad is EPHEMERAL — port it into the repo if a durable
     test is wanted, or list it here.)
@@ -139,7 +139,8 @@ eliminated are the audit trail.
 **Why:** append-only logs never rot; **every rotten doc is a current-state document without an update
 trigger** (one reconciliation day once found five materially stale docs — including an architecture
 doc asserting the OPPOSITE of shipped reality). The fix is a sweep bound to the one ritual that
-always runs — the handoff.
+always runs — the handoff. (The conventional framing: updating the docs a change affects is part
+of the **Definition of Done**.)
 
 **BEFORE writing the handoff, walk the project's current-state docs (listed in the configuration
 block) and reconcile every one the session's work triggered.** Then the handoff's §4 lists what was

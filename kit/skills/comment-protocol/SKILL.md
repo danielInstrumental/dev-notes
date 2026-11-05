@@ -1,6 +1,6 @@
 ---
 name: comment-protocol
-description: Conventions for comments, markers and docs that a reader with no project memory can trust — decision fingerprints, KIND/flip-condition test headers, KEEP-IN-SYNC markers, dated claims. Use on day one of a new project, when adding comments or markers, or when auditing an existing codebase.
+description: Conventions for comments, markers and docs that a reader with no project memory can trust — why-comments, KIND/flip-condition test headers, KEEP-IN-SYNC markers, dated claims. Use on day one of a new project, when adding comments or markers, or when auditing an existing codebase.
 ---
 
 # comment-protocol — annotations a zero-context reader can trust
@@ -13,12 +13,12 @@ Adopt from DAY ONE of a new project — retrofitting cost that project a full au
 
 ## The seven principles
 
-1. **Decisions leave fingerprints.** Every deliberate oddity gets a dated comment AT THE SITE:
+1. **Decisions leave why-comments.** Every deliberate oddity gets a dated comment AT THE SITE:
    what it is, why, and what would change it ("dormant but supported — set required:true and it
-   renders; do not clean"). The corollary is the **Chesterton test**: when you meet something that
-   looks wrong, ask *"did anyone write down a reason?"* — a fingerprint means decision (leave it or
+   renders; do not clean"). The corollary is **Chesterton's fence**: when you meet something that
+   looks wrong, ask *"did anyone write down a reason?"* — a why-comment means decision (leave it or
    re-open it consciously); silence means presumed rot (verify, then fix). This only works if
-   fingerprints are the RULE, so silence is INFORMATIVE.
+   why-comments are the RULE, so silence is INFORMATIVE.
 2. **Signals declare their own semantics.** A test states its KIND and its **flip condition** —
    what a red means and what to do (see `write-tests`' taxonomy). A marker states who sets it and
    who clears it. If interpreting a signal needs a human who remembers, the signal is incomplete.
@@ -32,7 +32,7 @@ Adopt from DAY ONE of a new project — retrofitting cost that project a full au
    lists, "never delete-to-green", "deliberately dormant — do not remove", and **reopen triggers**
    on every declined decision (a recorded "no" without a trigger gets re-litigated forever).
 6. **Instructions outrank descriptions.** A stale instruction causes a repeat failure; a stale
-   description only confuses. Write more instructions ("edit BOTH copies, then run the parity
+   description only confuses. Write more instructions ("edit BOTH copies, then run the differential
    test") and fewer descriptions; when auditing docs for rot, sweep instructions first.
 7. **Docs are tested by journeys, not reviews.** The acceptance test for documentation is the
    **stranger test**: pick a realistic task ("change this copy", "add a field end-to-end",
@@ -44,8 +44,8 @@ Adopt from DAY ONE of a new project — retrofitting cost that project a full au
 | Marker | Where | Says |
 |---|---|---|
 | `// KIND: <kind> … FLIP CONDITION: …` | line 1 of every test file | what the test is, what a red means, what to do |
-| `KEEP IN SYNC with <all copies> (+ the pin)` | every copy of forced duplication | the roster of copies + the machine check |
-| `<claim> (deliberate — <why>; changes if <trigger>) [YYYY-MM-DD]` | at any looks-wrong-on-purpose site | the decision fingerprint |
+| `KEEP IN SYNC with <all copies> (+ the differential test)` | every copy of forced duplication | the roster of copies + the machine check |
+| `<claim> (deliberate — <why>; changes if <trigger>) [YYYY-MM-DD]` | at any looks-wrong-on-purpose site | the why-comment |
 | `⚠ DORMANT — DO NOT REMOVE (<role>)` | unused-but-load-bearing files | dead-looking ≠ deletable |
 | a `DO NOT` list | the handoff / CLAUDE.md | prohibitions, enumerated |
 | `🚫 declined <date> — reopen if <trigger>` | register entries | a durable "no" |
@@ -57,10 +57,11 @@ These compose existing ideas: **codetags** (PEP 350 — standard comment tags), 
 protocol inlines micro-ADRs at the code site; big decisions still deserve a real ADR file),
 **Diátaxis** (keep how-to playbooks, reference inventories and explanation maps as SEPARATE
 documents), **docs-as-code**. The integration — designing all of it for a zero-context reader —
-is the part with no standard name yet; "agent-legible" is the emerging term.
+is the part with no standard name yet. This kit calls it "agent-legible"; the nearest conventional
+ideas are **self-documenting code** and **docs-as-code**.
 
 ## Cross-links (in this kit)
 
 `write-tests` (the test taxonomy the KIND header points into) · `plan-first` (the KEEP-IN-SYNC +
-registry duty) · `write-handoff` (DO-NOT lists, mental-model pins) · the concepts chapters (`.claude/knowledge/concepts/documentation-and-knowledge.md`: ADR,
+registry duty) · `write-handoff` (DO-NOT lists, key distinctions) · the concepts chapters (`.claude/knowledge/concepts/documentation-and-knowledge.md`: ADR,
 stranger test) · the kit's `templates/` (the register headings' token convention).

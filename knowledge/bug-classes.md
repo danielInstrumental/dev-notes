@@ -26,8 +26,8 @@ Entry format — built for RECOGNITION from symptoms:
 - **Check-then-act race (TOCTOU)** — two runs both check a condition ("no record exists"), both see
   the same answer, both act — e.g. a duplicate record created by concurrent page loads.
   *You might have it when…* duplicates appear despite code that "checks first".
-  *Mitigations:* unique constraints, idempotent create (upsert), a single-creator rule, atomic
-  check-and-set operations.
+  *Mitigations:* unique constraints, idempotent create (upsert), the single-writer principle,
+  atomic check-and-set operations.
 - **Lost update / last-writer-wins** — two writers read the same state, both modify their copy, the
   second write silently erases the first (the classic multi-tab bug).
   *You might have it when…* a change a user definitely made is gone, with no error anywhere.
@@ -63,21 +63,21 @@ Entry format — built for RECOGNITION from symptoms:
   "recovery" is what destroys it.
   *You might have it when…* data vanishes wholesale moments after an error that "was handled" — a
   corrupt-but-repairable record becomes a valid-but-empty one, with no error anywhere.
-  *Mitigations:* fail-loud on write paths (refuse to write when stored state can't be
-  parsed/trusted — classify-don't-swallow); reserve fallbacks for READ paths, where they can't
+  *Mitigations:* fail fast on write paths (refuse to write when stored state can't be
+  parsed/trusted — never swallow the error); reserve fallbacks for READ paths, where they can't
   persist; choose availability-vs-durability consciously per path (for writes over long-lived
   user data, durability wins). The strongest tell that it's a bug, not a decision: every sibling
   reader refuses to touch the unparseable state while one writer replaces it (invariant
   inconsistency).
-- **Compensating defects (the mutual-protection trap)** — two defects cancel each other out so the
-  feature works; fixing either one ALONE breaks it.
+- **Defect masking (compensating defects)** — two defects cancel each other out so the feature
+  works; fixing either one ALONE breaks it.
   *You might have it when…* something "obviously wrong" (a hidden button, a dead style rule, an
   inverted flag) turns out to be load-bearing — the feature works through an accident that a second
   defect enables.
   *Mitigations:* before fixing anything "obviously broken", verify how the feature currently works
   AT RUNTIME (not from source alone); fix interacting defects as ONE unit, never separately; record
   the pair loudly wherever either half is listed, so nobody later fixes one half as cleanup.
-- **Correlated reporting failure (shared-fate observability)** — the mechanism that would report a
+- **Correlated failure of monitoring (fate sharing)** — the mechanism that would report a
   failure fails WITH it, from the same cause — so the failure is silent exactly when it happens.
   *You might have it when…* a marker/alert/log that "always" gets written is missing precisely for
   the incident that mattered — the outage took the reporter down with it.
@@ -105,20 +105,20 @@ Entry format — built for RECOGNITION from symptoms:
   *You might have it when…* behavior differs between two paths that are "the same" — client accepts
   what the server rejects.
   *Mitigations:* single source of truth where possible; where duplication is forced, KEEP-IN-SYNC
-  markers + parity tests + a registry of the copies.
+  comments + differential tests + a registry of the copies.
 - **Orphaned data** — a record's parent/reference was deleted or never landed, leaving it dangling.
   *You might have it when…* counts don't add up, or cleanup jobs find records nothing points to.
-  *Mitigations:* deletes detected by absence-diffing; cascade rules chosen explicitly; periodic
-  orphan sweeps.
+  *Mitigations:* deletes detected by reconciliation (diff desired vs actual); cascade rules chosen
+  explicitly; periodic orphan sweeps.
 - **Schema / shape mismatch** — data saved under an old shape meets code expecting the new shape
   (renamed key, string-vs-array, enum value casing).
   *You might have it when…* only OLD records break, or a field is mysteriously empty after a rename.
-  *Mitigations:* normalize-on-read gateways, migrations, backward-compatible readers, compatibility
+  *Mitigations:* tolerant readers (normalize old shapes on read) or lazy migrations, migrations, backward-compatible readers, compatibility
   checks in every schema-touching plan.
 
 ## Automation & feedback loops
 
-- **Ambiguous trigger (echo re-fire)** — an automation fires on a state change that BOTH genuine
+- **Automation feedback loop (echo / self-triggering automation)** — an automation fires on a state change that BOTH genuine
   intent and the system's own downstream writes (form echoes, sync-backs, derived updates) produce
   — so processing an old item re-triggers the flow as if it were a new request.
   *You might have it when…* an automated message/action duplicates whenever two items overlap or
@@ -204,7 +204,7 @@ a project meets them (grow-rules).
   auto-completed because `undefined` was treated as `false`.
   *Mitigations:* name each state's meaning explicitly; test the trichotomy; avoid truthiness checks
   where the distinction matters.
-- **Presence-vs-value check (the empty-skeleton bypass)** — a validity check counts KEYS PRESENT
+- **Improper input validation: presence vs value (CWE-20)** — a validity check counts KEYS PRESENT
   instead of keys holding meaningful VALUES, so a full-but-empty skeleton passes as real data.
   *You might have it when…* junk input sails through a "does this look like an X" gate — especially
   when the producer emits its complete schema for ANY input, with values empty or hallucinated.

@@ -12,8 +12,9 @@
 - **guard** — a check that must pass before an action runs (the server-side one is authoritative).
   Also: a **guard clause** is an early return at the top of a function for invalid input
   → [[#Guard]]
-- 🏠 **backstop** (≈ redundant server-side validation) — a second check that catches what bypasses
-  the first → [[#Backstop]]
+- **server-side validation** — the server re-checks what the client already checked, so bypassing
+  the client still gets caught; one layer of defense in depth (formerly "backstop" in this kit)
+  → [[#Server-side validation]]
 
 ## Invariant
 
@@ -23,11 +24,9 @@ A condition that must **always hold**, or something breaks (e.g. "these two vali
 
 A check that **gates** an action: it runs before the action and either lets it proceed or rejects it. Usually implies a **server-side** gate — the authoritative line that genuinely *cannot* be bypassed.
 
-## Backstop
+## Server-side validation
 
-A guard that **duplicates a check already done elsewhere** (usually the client) so that bypassing the first still gets caught.
-
-*House term* — the standard phrasing is **redundant server-side validation**, one instance of [[security#Defense-in-depth]].
+A guard that **repeats a check already done elsewhere** (usually the client) so that bypassing the first still gets caught. It is one instance of [[security#Defense-in-depth]].
 
 ## Client validation vs server guard — different *jobs*, not redundancy
 

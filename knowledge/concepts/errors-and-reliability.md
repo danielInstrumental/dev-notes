@@ -8,8 +8,9 @@
   → [[#Fail-closed / fail-open]]
 - **fail-fast (fail-loud)** — on an unexpected condition, name it and STOP rather than paper over
   it with a fallback and continue
-- 🏠 **classify-don't-swallow** (≈ don't swallow errors: fail fast on unexpected stored state —
-  refuse the write instead of substituting a default)
+- **swallowed error** — an error caught and ignored, or replaced with a default, so nobody learns it
+  happened. On write paths, fail fast instead: refuse the write rather than substitute a default
+  (formerly "classify-don't-swallow" in this kit)
 - **fail-safe** — on failure, fall back to a state that causes no harm; for stored data, protect it
   even if the request fails
 - **availability vs durability** — availability: the system keeps responding; durability: saved data

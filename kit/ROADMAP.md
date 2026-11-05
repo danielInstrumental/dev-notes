@@ -49,7 +49,7 @@ Three standing improvement directions (the lens for every item below):
   associations — the "required ≠ existing" pre-build check) — *trigger: the first custom-object
   build* ·
   · **export-records** (read-only CSV dump) — *trigger: the first reporting/audit ask* ·
-  · **the one-question probe TEMPLATE** (a documented skeleton for probing any external API) —
+  · **the one-question learning-test TEMPLATE** (a documented skeleton for probing any external API) —
   *trigger: the first non-HubSpot integration.*
 - [ ] **`adopt-kit` skill** — automate the onboarding interview (copy folders, create data files,
   interview for config blocks). *Trigger: the SECOND adoption — do it manually once first, then

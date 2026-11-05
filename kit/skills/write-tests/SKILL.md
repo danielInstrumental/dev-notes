@@ -1,6 +1,6 @@
 ---
 name: write-tests
-description: How to write and maintain tests — conventional foundations (test pyramid, AAA structure, test-with-the-change, bug fixes close behavior-test gaps, test behavior not implementation, hermetic rules) plus agentic extensions (pins, drift guards, tripwires). Use when writing any test, choosing what kind of test a change needs, or setting up a new project's suite.
+description: How to write and maintain tests — conventional foundations (test pyramid, AAA structure, test-with-the-change, bug fixes close behavior-test gaps, test behavior not implementation, hermetic rules) plus agentic extensions (regression tests for decisions, differential tests, expected-failure tests). Use when writing any test, choosing what kind of test a change needs, or setting up a new project's suite.
 ---
 
 # Write Tests
@@ -47,7 +47,7 @@ predicted-test-impact section feeds this), fixing a bug, or setting up a new pro
    - **no behavior gap** → no new test. Typical cases: **cosmetic** (the test would just restate
      the fix — a change-detector test, see 4) · **data / config** (fix the data, or add validation
      that rejects it) · **external system** (a fixture/contract test, monitoring, or a documented
-     quirk) · **a lint rule catches the whole class better** (see the static gate) · **not
+     quirk) · **a lint rule catches the whole class better** (see the lint check) · **not
      reproducible yet** (add logging or an assertion first — a flaky test is worse than none).
 
    Whichever test you add or strengthen, run it BEFORE the fix and watch it fail — a test never
@@ -88,34 +88,41 @@ predicted-test-impact section feeds this), fixing a bug, or setting up a new pro
 Conventional kinds test what code DOES. These test that decided things STAY decided — the failure
 modes that matter most when agents edit code across many sessions:
 
-- **Pin** — freezes a decided behavior or value so it can't drift silently. Write one whenever a
-  plan names an invariant "enforced by convention" (see `plan-first` Phase 2 §6).
-- **Drift / parity guard** — asserts two DELIBERATE copies of logic are still identical (compare
-  source or behavior). Required for every entry in the `plan-first` guards registry.
-- **Tripwire** — DESIGNED to go red when a planned event happens (a go-live flip, an external
-  activation). A red tripwire is the signal working: rewrite it WITH the change it detects.
-- **Inertness pin** — proves dormant/data-gated code changed nothing about live behavior
-  (byte-identical outputs against current fixtures). Required for DATA-GATED INERT edits.
-- **Replay / golden-master** — replays a real captured payload (pseudonymized) through the real
-  engine and pins the exact output census. The strongest guard on an external contract.
+- **Regression test for a decision** — freezes a decided behavior or value so it can't drift
+  silently; the test NAME states the decision. Write one whenever a plan names an invariant
+  "enforced by convention" (see `plan-first` Phase 2 §6). *(Formerly "pin".)*
+- **Differential test** — runs two DELIBERATE copies of logic on the same shared test cases and
+  asserts they still agree. Required for every entry in the `plan-first` guards registry.
+  *(Formerly "drift / parity guard".)*
+- **Expected-failure test** — DESIGNED to go red when a planned event happens (a go-live flip, an
+  external activation); tooling: pytest `xfail(strict=True)`, Vitest `test.fails`. A red
+  expected-failure test is the signal working: rewrite it WITH the change it detects.
+  *(Formerly "tripwire".)*
+- **Flag-off regression test** — proves dark-launched (data-gated) code changed nothing about
+  live behavior (byte-identical outputs against current fixtures). Required for dark-launch
+  edits. *(Formerly "inertness pin".)*
+- **Golden master (snapshot / approval test)** — replays a real captured payload (pseudonymized)
+  through the real engine and asserts the exact output. The strongest guard on an external
+  contract.
 
 **Rules that make these work:**
 
-- **Never delete-to-green.** Before touching a red test, identify its KIND — a red pin means the
-  edit landed (flip it with the change); a red tripwire means the event fired; a red behavior test
+- **Never delete-to-green.** Before touching a red test, identify its KIND — a red regression test for a
+  decision means the edit landed (flip it with the change); a red expected-failure test means the
+  event fired; a red behavior test
   means a bug. "Fixing" a guard to green destroys it.
-- **Keep a taxonomy README in the suite** — a table classifying every test file's KIND and what
+- **Keep a test strategy README in the suite** — a table classifying every test file's KIND and what
   each red means, plus the current expected count. A suite whose reds can't be diagnosed gets
   deleted-to-green under deadline pressure.
 - **Predicted test impact before implementing** (from `plan-first` Phase 4): which tests MUST
-  redden (proof the edit landed) · MUST stay green (regression pins) · are NEW · become
+  redden (proof the edit landed) · MUST stay green (regression tests) · are NEW · become
   intent-divergent (green but now misnamed — rename with the change).
 
 ---
 
-## The static gate — running the linter as a test
+## The lint check — running the linter as a test
 
-Static analysis has a taxonomy row; this is the ADOPTION RECIPE — earned the day a lint gate's
+Static analysis has a row in the test-kinds table; this is the ADOPTION RECIPE — earned the day a lint check's
 maiden run found three latent use-before-define crashes that a 1,100-test suite couldn't see
 (the suite ran the logic; nothing ever *resolved the identifiers* in the JSX layer).
 
@@ -131,7 +138,7 @@ blank page in production.
    reds are ever noise gets ignored; a curated gate's every red is a defect.
 2. **Mount it IN the suite** (a `lint.test.js` invoking the linter's Node API) when the project
    has no CI: the gate then fires with the ritual that already exists (`npm test`) instead of
-   adding a ritual someone must remember. Give it an anti-vacuous floor (assert ≥N files were
+   adding a ritual someone must remember. Guard against a vacuous pass (assert ≥N files were
    actually linted — a broken glob otherwise passes on zero files).
 3. **Demand a green baseline, and TRIAGE the maiden run.** First-run hits are findings: fix the
    code, or record a conscious config decision — never widen the config to get green.
@@ -147,20 +154,20 @@ blank page in production.
 |---|---|
 | New pure logic (validator, transform, guard) | Unit tests for the matrix (happy / failures / boundaries / no-ops) — TDD if the spec is clear |
 | A bug fix | Find the behavior gap (foundation 3): add or strengthen that behavior's test, watch it fail, then fix — no gap, no new test |
-| Touching a deliberate duplicate | Run + extend the parity guard; register in the guards registry |
-| A decision ("never write X", "always shape Y") | A pin naming the decision in its test name |
-| Dormant / data-gated code | Inertness pin + a fake-driven unit matrix for the new branch |
+| Touching a deliberate duplicate | Run + extend the differential test; register in the guards registry |
+| A decision ("never write X", "always shape Y") | A regression test naming the decision in its test name |
+| Unwired / dark-launched (data-gated) code | Flag-off regression test + a fake-driven unit matrix for the new branch |
 | An external contract (vendor payload, API shape) | A fixture replay test with pseudonymized captured data |
-| Hard to unit-test (real browser, real integration) | Escalate a tier — see the ladder in `.claude/knowledge/concepts/testing.md` — or a written manual QA checklist with observable must-pass checks |
+| Hard to unit-test (real browser, real integration) | Escalate a tier — see the ladder in `.claude/knowledge/concepts/testing.md` — or a written manual QA checklist with observable acceptance criteria |
 
 ---
 
 ## Related skills
 
 - `plan-first` — predicted test impact (Phase 4), invariant enforcement (Phase 2 §6), and the
-  guards registry every parity test pins.
+  guards registry every differential test protects.
 - `log-implementation` — every entry reports the suite result (`N/N` + case list) as evidence.
-- `write-handoff` — new pins/tripwires and their flip conditions go in the handoff's DO-NOT list;
+- `write-handoff` — new decision regression tests / expected-failure tests and their flip conditions go in the handoff's DO-NOT list;
   the tests README is a row in the pre-handoff sweep.
 - `.claude/knowledge/concepts/testing.md` — the full reference: all test kinds, when to reach for each,
   and the growth ladder (coverage → property-based → mutation → integration → E2E → CI; the
