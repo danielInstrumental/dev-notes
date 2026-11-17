@@ -10,11 +10,19 @@ Item format: `- [ ] TODO-N — one line`, and for Later items the REVISIT TRIGGE
 
 ## Now — current focus
 
+- [ ] **TODO-13 — Guide: finish the testing page** (`guide/testing.md`). Section 1 (the map) is
+  written. Next is **section 2, "Talk it through"** — the questions to discuss with the agent
+  before any code exists — then 3 "Set it up", 4 "As you build", 5 "Go deeper". One section at a
+  time: discuss, write, rebuild locally, I review in the browser. Candidate questions for
+  section 2 are in the 2026-11-16 handoff entry.
 - [ ] **TODO-1 — Testing review, part 2.** One idea at a time, keep / soften / drop each in
   `kit/skills/write-tests/SKILL.md`: the agentic extensions (**pin** first, then drift/parity
   guard, tripwire, inertness pin, replay/golden-master) → their rules (never delete-to-green,
   taxonomy README, predicted test impact) → a wording check of the 10 conventional foundations →
   the static gate → the growth ladder.
+  *(2026-11-16: the names in this item predate commit `944294f` — pin is now "regression test for
+  a decision", drift/parity guard "differential test", tripwire "expected-failure test", inertness
+  pin "flag-off regression test". The review itself is still open.)*
 
 ## Next — queued behind Now
 
@@ -29,6 +37,18 @@ Item format: `- [ ] TODO-N — one line`, and for Later items the REVISIT TRIGGE
 - [ ] **TODO-6 — Snippets section on the site.**
 - [ ] **TODO-7 — Lessons: a template + a site section.** Candidate first lesson: the macOS
   Desktop-permissions (TCC) gotcha from the CMS React inbox note (its "graduate" line).
+
+- [ ] **TODO-14 — Guide: the other seven themes** (`guide/README.md`): requirements & scope,
+  architecture, data & integrations, security & access, environments & deployment, failure handling
+  & monitoring, ways of working. Same five-section shape as testing unless a theme needs otherwise.
+  The theme list itself is a proposal — check it against a standard reference when starting.
+- [ ] **TODO-15 — Testing chapter: add the missing test anti-patterns** as terms: over-mocked
+  (mock only at system boundaries), shape test, redundant test, plus named entries for misnamed and
+  non-functional tests. Tautological and change-detector are already there.
+- [ ] **TODO-16 — Kit: two generic prompts**, write-a-test and test-suite audit, made
+  project-neutral, then linked from the testing guide page. Decide first whether write-a-test's
+  "one test per behavior, no unrequested edge cases" replaces or sits beside the skill's "test the
+  matrix" rule.
 
 ## Later — parked, each with its revisit trigger
 
@@ -47,5 +67,7 @@ Item format: `- [ ] TODO-N — one line`, and for Later items the REVISIT TRIGGE
 
 ## Done
 
+- 2026-11-16 — Session 2: `guide/` created with the themes table and the testing page (map
+  written); the guide is on the site; wider page layout. Details: `.ai/HANDOFF_LOG.md`, 2026-11-16 entry.
 - 2026-09-25 — Session 1: cleanup, knowledge/kit split, concepts as a book, definitions checked,
   inbox, site, bug-fix testing rules, this log. Details: `.ai/HANDOFF_LOG.md`, 2026-09-25 entry.

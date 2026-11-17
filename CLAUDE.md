@@ -16,7 +16,8 @@ I'm learning as I go — much of this is new to me.
   diff) and ask. Approval covers only what was described. Reading files to answer a question is fine.
 - After approval: make the change, show what changed, then **commit and push to `main`** when I
   say so. One logical change per commit.
-- After any change to `knowledge/`, `inbox/` or `site/`: rebuild the site and republish it.
+- After any change to `knowledge/`, `guide/`, `inbox/` or `site/`: rebuild the site. While a page
+  is being drafted a local rebuild is enough; republish when I say so, or at the end of the session.
 - **Explain things plainly, with a concrete example.** Check claims against standard references
   and say honestly when my notes are wrong or too narrow. Prefer conventional, right-sized practice
   over expert-only overhead; when a note says "always", ask whether it should be "by default".
@@ -29,6 +30,9 @@ I'm learning as I go — much of this is new to me.
 - **Concepts** (`knowledge/concepts/`): one file per chapter; a term goes in the chapter whose
   **Covers** line fits it; a term and its deep dive live in the same chapter. Empty chapters are
   intentional — add terms as I meet them, or when I ask "what's missing from <chapter>?".
+- **Guide** (`guide/`): one page per theme, linked from the themes table in `guide/README.md`.
+  Pages link into the concepts chapters instead of redefining terms. Written in a professional
+  register: standard terms, still plain enough for a learner.
 - **Inbox** (`inbox/`): dated notes with `Date` / `Tags` / `Status`; link official docs; a note
   graduates to a permanent home or gets dropped (see `inbox/README.md`).
 - **The build fails loudly on purpose.** Fix the note, never loosen the build to get green.
@@ -39,6 +43,7 @@ I'm learning as I go — much of this is new to me.
 |---|---|
 | `knowledge/concepts/` | The concepts book — `README.md` is the table of contents (5 parts, 16 chapters) |
 | `knowledge/bug-classes.md` | Bug classes (not yet on the site — see TODO) |
+| `guide/` | The project-kickoff guide — `README.md` is the themes table (order, question, status); one page per theme |
 | `inbox/` | Notes in progress |
 | `kit/` | The agent-skills kit + templates + `install.sh` (installs into OTHER projects, not this one) |
 | `snippets/` | Reusable code (HubSpot read-only helpers) |

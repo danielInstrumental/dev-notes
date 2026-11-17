@@ -5,6 +5,86 @@
 
 # Handoff Log
 
+## 2026-11-16 — Session 2: a guide section, starting with the testing page
+
+### Summary
+
+Added a second kind of content next to the concepts book. The concepts are reference material (look
+a term up); the new **guide** is what to think through, and discuss with the agent, when a project
+starts. Created the themes table, started the testing page, and put the guide on the site.
+
+Note: the two commits of 2026-11-05 (`944294f` conventional terms in place of house terms,
+`00e1069` SWEBOK-aligned part names) were made without a handoff entry. They are in git and are
+reflected in the files; this entry is the first since Session 1.
+
+### Where things stand
+
+- **Guide:** `guide/README.md` lists eight proposed themes. One has a page: `guide/testing.md`.
+  - Section 1, **The map**, is written: tests described by scope (static check, unit, integration,
+    end-to-end) and by purpose (behavior, regression, smoke, acceptance, characterization,
+    differential, expected-failure).
+  - Sections 2–5 are one-line outlines: Talk it through · Set it up · As you build · Go deeper.
+- **Site:** has a Guide group at the top of the sidebar, an overview page, a view per guide page,
+  and guide pages in search. The layout is wider. Republished to the same link at session end.
+- **Concepts, kit, inbox:** unchanged this session.
+- Everything committed and pushed; `main` matches GitHub.
+
+### Decisions — settled; reopen only with a reason
+
+- **The guide is separate from the concepts.** The concepts stay as they are. Guide pages link to
+  concepts chapters for vocabulary and do not redefine terms.
+- **A guide page has five sections:** the map (vocabulary on one screen) · talk it through
+  (questions for the agent before code exists) · set it up (day-one boilerplate) · as you build
+  (the per-change checklist) · go deeper (links).
+- **Unit tests and end-to-end checks are not rivals.** A project has both from the start: many unit
+  tests for the logic, and at least one end-to-end check proving the application works. This moves
+  one smoke flow from rung 6 of the growth ladder to day one; the rest of the ladder stands.
+- **Guide pages use a professional register:** standard terms (defect, specification, verifies),
+  still understandable to a learner. No casual phrasing in tables.
+- **Left out of the map on purpose:** structural/source invariants and meta-guards. They guard a
+  very large suite and are not needed at project start.
+- **While drafting, rebuild locally only**; republish the online copy when asked or at session end.
+
+### Open questions
+
+- **One test per behavior, or test the matrix?** A write-a-test prompt I brought in says one test
+  per behavior with no unrequested edge cases; `write-tests` foundation 8 says test failure modes
+  and boundaries. Decide which is the default (TODO-16).
+- **The theme list and the map's placement of "acceptance"** were written from memory, not checked
+  against a standard reference. A formal testing syllabus treats acceptance as a test level (scope)
+  rather than a purpose. Check when convenient.
+- **"Differential test" has two uses:** two copies of one rule that must agree (this repo), and an
+  old system versus its rewrite (migration). The map names both; the glossary names only the first.
+
+### Material gathered for section 2 ("Talk it through")
+
+Candidate kickoff questions, from the session's discussion and from reviewing an earlier portal
+project where tests started three months in:
+
+1. How will the agent run the application and see whether a change works, given that only I deploy?
+2. Which three to five user flows are critical?
+3. Can server-side code share modules on this platform? (Check the platform's docs. Where it
+   cannot, logic gets copied and needs differential tests.)
+4. Where does the logic live? Rules kept in small plain files can be unit tested; rules inside
+   large UI components cannot.
+5. Will endpoints be tested through their real entry point with a fake client, including a caller
+   who does not own the record?
+6. Where do end-to-end tests run, with what test data, and how is that data cleaned up?
+7. What must pass before I deploy, and what stays a manual check?
+
+An article on verification by the Claude Code team (claude.dev blog, 2026-11-16) informed the
+unit-plus-end-to-end decision and suggests three more ideas worth considering for sections 3 and 4:
+a `verify` skill that runs the app as the smoke test, running cheap checks (tests, build, lint)
+first, and stopping for a human after three failed fix attempts.
+
+### Pick up here
+
+**TODO-13 — section 2 of `guide/testing.md`.** Go through the candidate questions above with me one
+at a time, keep the ones that hold up, write the section, rebuild, and I review it in the browser.
+
+To resume: open Claude Code **inside `dev-notes/`** (so `CLAUDE.md` loads) and say
+"let's continue".
+
 ## 2026-09-25 — Session 1: from notebook to organized vault + searchable site
 
 ### Summary
