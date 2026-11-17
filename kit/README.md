@@ -45,7 +45,7 @@ SESSION END ───▶ current-state sweep + write the handoff               (
 | [`log-implementation/`](skills/log-implementation/SKILL.md) | One as-built entry per verified unit of change | After each user-verified change |
 | [`write-tests/`](skills/write-tests/SKILL.md) | Conventional testing practice (pyramid, AAA, test-with-the-change) + regression, differential and expected-failure tests | Writing any test; choosing what kind a change needs |
 | ↳ [`knowledge/concepts/testing.md`](../knowledge/concepts/testing.md) | All test kinds + the growth ladder (coverage → property-based → mutation → integration → E2E → CI) | Reference, on demand |
-| [`write-commits/`](skills/write-commits/SKILL.md) | Commit message conventions — Conventional Commits types + the seven timeless rules | Every commit / commit recommendation |
+| [`write-commits/`](skills/write-commits/SKILL.md) | Commit conventions (Conventional Commits types, Beams' seven rules) + the copy-ready add/commit commands | Every commit / commit recommendation |
 | [`write-handoff/`](skills/write-handoff/SKILL.md) | The 13-section session handoff + the pre-handoff staleness sweep | Once, at session end |
 | [`comment-protocol/`](skills/comment-protocol/SKILL.md) | The agent-legible annotation system: why-comments, KIND/flip-condition headers, KEEP-IN-SYNC markers, dated claims, negative documentation, the stranger test | Day one of a new project; auditing an existing one |
 | [`prompt-coaching/`](skills/prompt-coaching/SKILL.md) | Persistent instruction: coach the user's prompts every turn | Every turn, every session (standing rule) |
