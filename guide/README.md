@@ -20,6 +20,7 @@ Status: **To do** = page not written yet · **In progress** = page started. We b
 | 6 | Environments & deployment | Where do we develop and test safely, how does code reach production, and how do we roll back? | [Delivery & version control](../knowledge/concepts/delivery-and-version-control.md) | To do |
 | 7 | Failure handling & monitoring | What happens when something fails, and how do we find out? | [Errors & reliability](../knowledge/concepts/errors-and-reliability.md) · [Operations & observability](../knowledge/concepts/operations-and-observability.md) | To do |
 | 8 | Ways of working | How do we branch, document, and work with the agent? | [Documentation & knowledge](../knowledge/concepts/documentation-and-knowledge.md) · [Working with AI agents](../knowledge/concepts/working-with-ai-agents.md) · the [kit](../kit/README.md) | To do |
+| 9 | [Commits](commits.md) | What does a commit message look like, how large is one commit, and who writes it? | [Delivery & version control](../knowledge/concepts/delivery-and-version-control.md) · the [`write-commits` skill](../kit/skills/write-commits/SKILL.md) | In progress |
 
 _The list is a starting proposal, not checked against a standard reference yet. Themes may merge,
 split or be added as each page gets written._
