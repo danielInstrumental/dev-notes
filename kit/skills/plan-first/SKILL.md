@@ -10,7 +10,7 @@ description: Plan-first workflow for any code change — ground the plan in curr
 > - **Companion checklist:** `change-impact-checklist.md` (in this skill's folder — walk it in Phase 2 and again in Phase 7)
 > - **Plan log:** `.ai/PLAN_LOG.md` · **Standalone plans:** `.ai/PLANS/<initiative>/`
 > - **Bug log path:** <where numbered out-of-scope findings go>
-> - **Pre-merge checks:** <the project's syntax/lint/test commands run before handing off>
+> - **Pre-merge checks:** <the project's syntax/lint/test commands run before handing off — e.g. `npm test`> (tests follow the `write-tests` skill)
 
 ## Purpose
 
@@ -219,6 +219,9 @@ Two halves, both planned up front:
   testable branch** (guards, validators, transforms, heal/reconcile rules). Test the matrix: happy
   path, each failure mode, boundary cases (equal dates, empty/null/malformed input), and the no-op
   cases (nothing changed → nothing written). Report as N/N passed with the case list.
+  Write the tests per the `write-tests` skill, and read it before writing this verification plan:
+  it says which kind of test the change needs, requires seeing each new test fail before the fix,
+  and keeps the tests README current.
 - **PREDICTED TEST IMPACT — required for any change touching suite-covered code, written BEFORE
   implementing.** Four lists: **(a) tests that MUST redden** — an expected red is PROOF the edit
   landed, not a failure · **(b) tests that MUST stay green** — the flag-off and regression tests ·
@@ -405,3 +408,5 @@ audit capability, pivot speed), not by whether it runs in production.
 - `session-startup` — runs before this: no plan is proposed until the startup briefing is presented.
 - `log-implementation` — Phase 8's close-out entry, written only after the user verifies.
 - `write-handoff` — the end-of-session sweep that backstops this skill's registry and status flips.
+- `write-tests` — how the tests Phase 4 requires are written: test kinds, seen-failing-first, the
+  lint check, and the tests README.

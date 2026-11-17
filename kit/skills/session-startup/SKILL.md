@@ -122,3 +122,4 @@ Then: propose a plan (per the `plan-first` skill) and wait for the explicit "go"
 - `write-handoff` — produces the handoff this skill reads at the top of the log.
 - `log-implementation` — the as-built history this skill skims for the "why" behind current code.
 - `prompt-coaching` — standing rule active every turn: every response ends with a prompt-coaching note.
+- `write-tests` — the rules for the test suite whose count this skill checks against the handoff.
