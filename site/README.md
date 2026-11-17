@@ -35,6 +35,10 @@ the page is worse than a build you have to fix.
 - **A guide page:** create `guide/<theme>.md` (title, then `##` sections) and link it from that
   theme's row in the table in [`guide/README.md`](../guide/README.md); the table sets the order,
   the question and the status shown on the site. A theme without a link shows as not written yet.
+- **Part of another file on a guide page:** a line holding only
+  `![[kit/skills/write-commits/SKILL.md#Message rules]]` (path from the repo root) is replaced at
+  build time by that file's `## Message rules` section, with a source link under it. Edit the
+  section in its own file; the page follows on the next build. A missing file or heading stops the build.
 - **An inbox note:** add `inbox/YYYY-MM-DD-title.md` with the `Date` / `Tags` / `Status` header
   (see [`inbox/README.md`](../inbox/README.md)), then rebuild.
 - **A new section of the site** (bug classes, the kit…): a parser in `build.mjs` plus a view in

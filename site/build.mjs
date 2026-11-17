@@ -240,6 +240,30 @@ function siteLinks(md, where) {
     return `](${REPO_URL}${path}${frag ? '#' + frag : ''})`;
   });
 }
+// A line holding only ![[path/from/repo/root.md#Heading]] in a guide page is replaced by the body
+// of that file's "## Heading" section, followed by a source link. This lets a guide page show a
+// table kept in a kit skill without a second copy that could drift. A missing file or heading
+// stops the build.
+function embeds(md, where) {
+  return md.replace(/^!\[\[([^\]#]+\.md)#([^\]]+)\]\]$/gm, (_, path, heading) => {
+    const ref = `![[${path}#${heading}]] in ${where}`;
+    if (path.startsWith('/') || path.split('/').includes('..')) fail(`${ref}: give the path from the repo root`);
+    let src;
+    try { src = read(path); } catch { fail(`${ref}: no file ${path}`); }
+    const lines = src.split('\n');
+    let fence = false, start = -1, end = lines.length;
+    for (let i = 0; i < lines.length; i++) {
+      if (/^```/.test(lines[i])) fence = !fence;
+      if (fence || !/^## /.test(lines[i])) continue;
+      if (start >= 0) { end = i; break; }
+      if (norm(lines[i].slice(3)) === norm(heading)) start = i;
+    }
+    if (start < 0) fail(`${ref}: ${path} has no "## ${heading}" section`);
+    const skill = path.match(/^kit\/skills\/([a-z0-9-]+)\/SKILL\.md$/);
+    const name = skill ? `the ${skill[1]} skill` : path;
+    return `${lines.slice(start + 1, end).join('\n').trim()}\n\n_Source: [${name}](../${path}#${slug(heading)})_`;
+  });
+}
 // [[chapter#Heading]] works in guide pages too, so a guide page can point at one term's deep dive
 const wikiLinks = (md, where) => md.replace(/\[\[([^\]]+)\]\]/g, (_, ref) => {
   if (ref.startsWith('#')) fail(`${where}: [[${ref}]] needs a chapter name, e.g. [[testing${ref}]]`);
@@ -268,7 +292,7 @@ const guidePages = themes.map((theme) => {
   const where = `${GUIDE}${theme.file}.md`;
   const md = read(where);
   if (!/^# .+$/m.test(md)) fail(`${where} has no # title`);
-  const tokens = marked.lexer(wikiLinks(siteLinks(md.replace(/^# .+$/m, ''), where), where));
+  const tokens = marked.lexer(wikiLinks(siteLinks(embeds(md.replace(/^# .+$/m, ''), where), where), where));
   const intro = [];
   const sections = [];
   for (const t of tokens) {
@@ -289,7 +313,7 @@ const guidePages = themes.map((theme) => {
 
 const repo = fileURLToPath(ROOT);
 const git = (cmd) => { try { return execSync(`git ${cmd}`, { cwd: repo }).toString().trim(); } catch { return ''; } };
-const edited = git('status --porcelain -- knowledge inbox guide') !== '';
+const edited = git('status --porcelain -- knowledge inbox guide kit') !== '';   // kit: guide pages embed from it
 const data = {
   built: new Date().toISOString().slice(0, 10),
   commit: (git('rev-parse --short HEAD') || 'unknown') + (edited ? ' + local edits' : ''),
