@@ -9,7 +9,8 @@
 //
 // The page mirrors the files: knowledge/concepts/README.md is the table of contents (parts →
 // chapters), and each chapter file is one page — its Covers line, its Terms list, then its
-// own-words explanations (the ## sections below the Terms). inbox/ notes each become a page too.
+// own-words explanations (the ## sections below the Terms). inbox/ notes each become a page too,
+// and so does each guide/ page listed in the themes table of guide/README.md.
 //
 // It fails loudly: a chapter missing from the contents, a line it can't parse, or a [[link]] that
 // points nowhere stops the build with a message. A broken note should block the page, not silently
@@ -213,17 +214,89 @@ const notes = readdirSync(new URL(INBOX, ROOT))
   })
   .sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title));
 
-// ── 6. Fill the template ──
+// ── 6. The guide: guide/README.md lists the themes in order; a theme with a page links to its file ──
+//
+// A row of the themes table:  | 5 | [Testing](testing.md) | the question | concepts links | status |
+// A theme whose page isn't written yet has a plain title instead of a link.
+
+const GUIDE = 'guide/';
+const REPO_URL = 'https://github.com/danielInstrumental/dev-notes/blob/main/';
+
+// Relative markdown links: a concepts chapter or guide page opens on this site; any other file in
+// the repo (the kit, snippets…) isn't on the site yet, so it opens on GitHub.
+function siteLinks(md, where) {
+  return md.replace(/\]\((?!https?:|mailto:|#)([^)\s]+)\)/g, (_, href) => {
+    const [file, frag] = href.split('#');
+    const path = new URL(file, new URL(GUIDE, 'file:///')).pathname.slice(1);
+    const concept = path.match(/^knowledge\/concepts\/([a-z0-9-]+)\.md$/);
+    if (concept) {
+      if (concept[1] === 'README') return '](#concepts)';
+      if (!raw[concept[1]]) fail(`${where} links to ${file}, which isn't a concepts chapter`);
+      return `](#${concept[1]})`;
+    }
+    if (path === GUIDE + 'README.md') return '](#guide)';
+    const page = path.match(/^guide\/([a-z0-9-]+)\.md$/);
+    if (page) return `](#g-${page[1]}${frag ? '--' + slug(frag) : ''})`;
+    return `](${REPO_URL}${path}${frag ? '#' + frag : ''})`;
+  });
+}
+// [[chapter#Heading]] works in guide pages too, so a guide page can point at one term's deep dive
+const wikiLinks = (md, where) => md.replace(/\[\[([^\]]+)\]\]/g, (_, ref) => {
+  if (ref.startsWith('#')) fail(`${where}: [[${ref}]] needs a chapter name, e.g. [[testing${ref}]]`);
+  const r = resolve(ref, where);
+  return `[${r.label}](#${r.anchor})`;
+});
+
+const guideReadme = read(GUIDE + 'README.md');
+const guideIntro = guideReadme.slice(guideReadme.indexOf('\n'), guideReadme.indexOf('\n## ')).trim();
+const cell = (s) => marked.parseInline(siteLinks(s.trim(), GUIDE + 'README.md'));
+const themes = guideReadme.split('\n').flatMap((line) => {
+  const cols = line.split('|').map((c) => c.trim());
+  if (!/^\d+$/.test(cols[1] ?? '')) return [];
+  if (cols.length !== 7) fail(`${GUIDE}README.md: theme row ${cols[1]} needs 5 columns (# · theme · question · concepts · status)`);
+  const link = cols[2].match(/^\[(.+)\]\(([a-z0-9-]+)\.md\)$/);
+  return [{ num: Number(cols[1]), title: link ? link[1] : cols[2], file: link ? link[2] : '', question: cell(cols[3]), concepts: cell(cols[4]), status: cols[5] }];
+});
+if (!themes.length) fail(`${GUIDE}README.md has no themes table`);
+for (const f of readdirSync(new URL(GUIDE, ROOT)).filter((f) => f.endsWith('.md') && f !== 'README.md')) {
+  if (!themes.some((t) => t.file + '.md' === f)) fail(`${GUIDE}${f} isn't linked from the themes table in ${GUIDE}README.md`);
+}
+
+const guidePages = themes.map((theme) => {
+  const page = { ...theme, id: theme.file ? 'g-' + theme.file : '', intro: '', sections: [] };
+  if (!theme.file) return page;
+  const where = `${GUIDE}${theme.file}.md`;
+  const md = read(where);
+  if (!/^# .+$/m.test(md)) fail(`${where} has no # title`);
+  const tokens = marked.lexer(wikiLinks(siteLinks(md.replace(/^# .+$/m, ''), where), where));
+  const intro = [];
+  const sections = [];
+  for (const t of tokens) {
+    // the page repeats its question for anyone reading the markdown; the site shows the table's copy
+    if (t.type === 'blockquote' && !sections.length && /^\*\*The question this answers:\*\*/.test(t.text)) continue;
+    if (t.type === 'heading' && t.depth === 2) {
+      const heading = marked.parseInline(t.text);
+      sections.push({ id: `${page.id}--${slug(norm(t.text))}`, heading, plain: plain(heading), tokens: [] });
+    } else (sections.at(-1)?.tokens ?? intro).push(t);
+  }
+  const render = (toks) => marked.parser(Object.assign(toks, { links: tokens.links }));
+  page.intro = render(intro);
+  page.sections = sections.map(({ tokens: toks, ...s }) => { const html = render(toks); return { ...s, html, text: plain(html) }; });
+  return page;
+});
+
+// ── 7. Fill the template ──
 
 const repo = fileURLToPath(ROOT);
 const git = (cmd) => { try { return execSync(`git ${cmd}`, { cwd: repo }).toString().trim(); } catch { return ''; } };
-const edited = git('status --porcelain -- knowledge inbox') !== '';
+const edited = git('status --porcelain -- knowledge inbox guide') !== '';
 const data = {
   built: new Date().toISOString().slice(0, 10),
   commit: (git('rev-parse --short HEAD') || 'unknown') + (edited ? ' + local edits' : ''),
   parts,
   chapters,
   notes,
+  guide: { intro: marked.parse(siteLinks(guideIntro, GUIDE + 'README.md')), pages: guidePages },
 };
 const json = JSON.stringify(data).replace(/</g, '\\u003c');   // can't close the <script> early
 const SLOT = 'const DATA = __DATA__;';
@@ -238,4 +311,5 @@ const terms = chapters.flatMap((c) => c.terms);
 const empty = chapters.filter((c) => !c.terms.length).length;
 console.log(`built site/dist/dev-notes.html — ${terms.length} terms in ${chapters.length} chapters ` +
   `(${empty} empty) across ${parts.length} parts, ${chapters.reduce((n, c) => n + c.sections.length, 0)} explanations, ` +
-  `${terms.filter((t) => t.deep.length).length} terms linked to one; ${notes.length} inbox note${notes.length === 1 ? '' : 's'}`);
+  `${terms.filter((t) => t.deep.length).length} terms linked to one; ${notes.length} inbox note${notes.length === 1 ? '' : 's'}; ` +
+  `guide: ${guidePages.filter((p) => p.id).length} of ${guidePages.length} themes have a page`);

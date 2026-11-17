@@ -32,6 +32,9 @@ the page is worse than a build you have to fix.
   term at it with `→ [[#Heading]]`.
 - **A new chapter:** create the file (title, Covers line, `## Terms`) and add it to the Contents in
   `knowledge/concepts/README.md` — the build insists.
+- **A guide page:** create `guide/<theme>.md` (title, then `##` sections) and link it from that
+  theme's row in the table in [`guide/README.md`](../guide/README.md); the table sets the order,
+  the question and the status shown on the site. A theme without a link shows as not written yet.
 - **An inbox note:** add `inbox/YYYY-MM-DD-title.md` with the `Date` / `Tags` / `Status` header
   (see [`inbox/README.md`](../inbox/README.md)), then rebuild.
 - **A new section of the site** (bug classes, the kit…): a parser in `build.mjs` plus a view in
